@@ -30,3 +30,16 @@ A concept by concept breakdown of what happened
 - First run wasn't doing robust type checking, causing errors, had Gemini fix
 - again, had to create new database for each test
 - then, all tests passed
+
+# Upvoting
+### Concept spec
+- added queries get votes from user, get votes on an item, get all votes
+
+### implementation
+- did by hand, similar to posting
+
+### testing
+- Used Gemini 2.5 flash to generate tests
+- this time, included statement in prompt to open and close new database for each test, Gemini instead created tests so that they depend on each other
+- operating priniciple test was still isolated, so had to manually open and close db for that test
+- after doing so, whole suite passed

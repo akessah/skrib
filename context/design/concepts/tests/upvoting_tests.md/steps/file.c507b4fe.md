@@ -1,3 +1,12 @@
+---
+timestamp: 'Fri Oct 17 2025 14:56:07 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251017_145607.5599a42f.md]]'
+content_id: c507b4fe9edeb6bf2e57ad05d8de125aae381a4a2d8408dcfbc0a9777433a310
+---
+
+# file: src\concepts\skrib\Upvoting.ts
+
+```typescript
 import { Collection, Db } from "npm:mongodb";
 import { Empty, ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
@@ -100,3 +109,7 @@ export default class UpvotingConcept {
     return await this.votes.find().toArray();
   }
 }
+
+```
+
+Please be sure to create and close a new database with each test

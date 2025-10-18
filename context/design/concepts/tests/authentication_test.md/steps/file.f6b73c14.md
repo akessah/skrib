@@ -1,3 +1,12 @@
+---
+timestamp: 'Sat Oct 18 2025 14:05:55 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251018_140555.4de17b3a.md]]'
+content_id: f6b73c1467bc78494785ee67e89a754a7edceb71a8b1089898206a0e56490323
+---
+
+# file: src\concepts\skrib\Authentication.ts
+
+```typescript
 import { Collection, Db } from "npm:mongodb";
 import { Empty, ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
@@ -24,7 +33,7 @@ interface Users {
 
 
 export default class AuthenticationConcept {
-  private users: Collection<Users>;
+  users: Collection<Users>;
 
 
   constructor(private readonly db: Db) {
@@ -107,3 +116,7 @@ async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
     return await this.users.find().toArray();
   }
 }
+
+```
+
+Please be sure to create and close a new database with each test

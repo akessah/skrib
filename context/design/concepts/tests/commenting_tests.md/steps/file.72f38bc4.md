@@ -1,3 +1,12 @@
+---
+timestamp: 'Sat Oct 18 2025 14:27:24 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251018_142724.f044e1ca.md]]'
+content_id: 72f38bc461faab8ea7b24e885727a6b1e96d867d42e5c1a73ad054393561e18a
+---
+
+# file: src\concepts\skrib\Commenting.ts
+
+```typescript
 import { Collection, Db } from "npm:mongodb";
 import { Empty, ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
@@ -114,3 +123,7 @@ export default class CommentingConcept {
     return await this.comments.find().toArray();
   }
 }
+
+```
+
+Please be sure to create and close a new database with each test

@@ -64,7 +64,7 @@ export default class PostingConcept {
   async deletePost({ post }: { post: Post;}): Promise<Empty|{error: string}> {
     const existingPost = await this.posts.findOne({ _id: post });
     if (!existingPost) {
-      return { error: `Survey with ID ${post} not found.` };
+      return { error: `Post with ID ${post} not found.` };
     }
 
     this.posts.deleteOne({_id: post})
@@ -81,7 +81,7 @@ export default class PostingConcept {
   async editPost({ post, newBody }: { post: Post; newBody: string }): Promise<Empty|{error: string}> {
     const existingPost = await this.posts.findOne({ _id: post });
     if (!existingPost) {
-      return { error: `Survey with ID ${post} not found.` };
+      return { error: `Post with ID ${post} not found.` };
     }
     await this.posts.updateOne({_id: post }, { $set: { body: newBody } });
     return {};

@@ -10,7 +10,7 @@ State:
       a username String
       a password String
 
-actions:
+Actions:
 
     register (username: String, password: String):(user:User)
       requires: no User in the Users set has username
@@ -25,3 +25,8 @@ actions:
     authenticate (username: String, password: String):(user:User)
         requires: User with username and password exists in the Users set
         effects: returns that user
+
+Queries:
+
+    _getAllUsers()
+      effects: returns all users in set

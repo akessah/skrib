@@ -110,7 +110,7 @@ export default class CommentingConcept {
   /**
    * returns all comments in database
    */
-  async _getAllComments(): Promise<Comments[]> {
+  async _getAllComments({}): Promise<Comments[]> {
     return await this.comments.find().toArray();
   }
 }

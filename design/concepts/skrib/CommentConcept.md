@@ -12,7 +12,7 @@ State:
       a parent Item
 
 
-actions:
+Actions:
 
     create (user: User, body: String, parent: Item):(comment:Comment)
       effects: creates a comment with body by user that's child of parent and adds it to Comments set
@@ -24,7 +24,7 @@ actions:
         effects: replaces body of comment with newBody
 
 
-queries:
+Queries:
 
     _getCommentssByAuthor(user: User)
       effects: returns comments authored by user
@@ -33,4 +33,4 @@ queries:
       effects: returns comments authored by user
 
     _getAllComments()
-      effects: returns all posts in db
+      effects: returns all posts in set

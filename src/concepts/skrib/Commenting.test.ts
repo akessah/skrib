@@ -1,6 +1,6 @@
 import { assertEquals, assertNotEquals, assertArrayIncludes } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
-import { ID, Empty } from "@utils/types.ts";
+import { ID } from "@utils/types.ts";
 import CommentingConcept from "./Commenting.ts"; // Assuming the file is named Commenting.ts
 import { Db, MongoClient } from "npm:mongodb"; // <--- Add these imports for MongoDB types
 
@@ -32,10 +32,10 @@ Deno.test.afterEach(async () => {
     }
 });
 
-Deno.test("Action: createComment - Successfully creates a comment", async (t) => {
+Deno.test("Action: createComment - Successfully creates a comment", async () => {
     console.log("--- Test: createComment ---");
 
-    const initialComments = await commentingConcept._getAllComments();
+    const initialComments = await commentingConcept._getAllComments({});
     assertEquals(initialComments.length, 0, "Initially, there should be no comments.");
     console.log(`Initial comment count: ${initialComments.length}`);
 
@@ -47,7 +47,7 @@ Deno.test("Action: createComment - Successfully creates a comment", async (t) =>
     const newCommentId = result.comment as TestComment;
     console.log(`Created comment with ID: ${newCommentId}`);
 
-    const allComments = await commentingConcept._getAllComments();
+    const allComments = await commentingConcept._getAllComments({});
     assertEquals(allComments.length, 1, "There should be one comment after creation.");
     assertEquals(allComments[0]._id, newCommentId, "The returned comment ID should match the stored one.");
     assertEquals(allComments[0].author, userAlice, "The comment author should be Alice.");
@@ -56,7 +56,7 @@ Deno.test("Action: createComment - Successfully creates a comment", async (t) =>
     console.log("Comment creation verified successfully.");
 });
 
-Deno.test("Action: editComment - Successfully edits an existing comment", async (t) => {
+Deno.test("Action: editComment - Successfully edits an existing comment", async () => {
     console.log("--- Test: editComment ---");
 
     const initialBody = "Original comment body.";
@@ -78,7 +78,7 @@ Deno.test("Action: editComment - Successfully edits an existing comment", async 
     console.log("Comment edit verified successfully.");
 });
 
-Deno.test("Action: editComment - Fails to edit a non-existent comment", async (t) => {
+Deno.test("Action: editComment - Fails to edit a non-existent comment", async () => {
     console.log("--- Test: editComment (non-existent) ---");
     const nonExistentComment = "comment:nonexistent" as TestComment;
     const newBody = "Attempting to edit nothing.";
@@ -89,14 +89,14 @@ Deno.test("Action: editComment - Fails to edit a non-existent comment", async (t
     console.log("Attempted to edit non-existent comment, error returned as expected.");
 });
 
-Deno.test("Action: deleteComment - Successfully deletes an existing comment", async (t) => {
+Deno.test("Action: deleteComment - Successfully deletes an existing comment", async () => {
     console.log("--- Test: deleteComment ---");
 
     const createResult = await commentingConcept.createComment({ user: userAlice, body: "Comment to delete.", item: itemPost1 });
     const commentId = createResult.comment as TestComment;
     console.log(`Created comment with ID: ${commentId}`);
 
-    let allComments = await commentingConcept._getAllComments();
+    let allComments = await commentingConcept._getAllComments({});
     assertEquals(allComments.length, 1, "There should be one comment before deletion.");
 
     const deleteResult = await commentingConcept.deleteComment({ comment: commentId });
@@ -105,12 +105,12 @@ Deno.test("Action: deleteComment - Successfully deletes an existing comment", as
     assertEquals(deleteResult, {}, "Deleting a comment should return an empty object on success.");
     console.log(`Deleted comment with ID: ${commentId}`);
 
-    allComments = await commentingConcept._getAllComments();
+    allComments = await commentingConcept._getAllComments({});
     assertEquals(allComments.length, 0, "There should be no comments after deletion.");
     console.log("Comment deletion verified successfully.");
 });
 
-Deno.test("Action: deleteComment - Fails to delete a non-existent comment", async (t) => {
+Deno.test("Action: deleteComment - Fails to delete a non-existent comment", async () => {
     console.log("--- Test: deleteComment (non-existent) ---");
     const nonExistentComment = "comment:nonexistent" as TestComment;
     const result = await commentingConcept.deleteComment({ comment: nonExistentComment });
@@ -120,7 +120,7 @@ Deno.test("Action: deleteComment - Fails to delete a non-existent comment", asyn
     console.log("Attempted to delete non-existent comment, error returned as expected.");
 });
 
-Deno.test("Query: _getCommentsByAuthor - Returns comments by a specific author", async (t) => {
+Deno.test("Query: _getCommentsByAuthor - Returns comments by a specific author", async () => {
     console.log("--- Test: _getCommentsByAuthor ---");
 
     await commentingConcept.createComment({ user: userAlice, body: "Alice's comment 1.", item: itemPost1 });
@@ -146,7 +146,7 @@ Deno.test("Query: _getCommentsByAuthor - Returns comments by a specific author",
     console.log(`Found ${charlieComments.length} comments by Charlie (expected 0).`);
 });
 
-Deno.test("Query: _getCommentsByParent - Returns comments on a specific item", async (t) => {
+Deno.test("Query: _getCommentsByParent - Returns comments on a specific item", async () => {
     console.log("--- Test: _getCommentsByParent ---");
 
     await commentingConcept.createComment({ user: userAlice, body: "Comment on Post1 by Alice.", item: itemPost1 });
@@ -172,7 +172,7 @@ Deno.test("Query: _getCommentsByParent - Returns comments on a specific item", a
     console.log(`Found ${commentsOnNonExistent.length} comments on non-existent item (expected 0).`);
 });
 
-Deno.test("Query: _getAllComments - Returns all comments in the database", async (t) => {
+Deno.test("Query: _getAllComments - Returns all comments in the database", async () => {
     console.log("--- Test: _getAllComments ---");
 
     await commentingConcept.createComment({ user: userAlice, body: "Comment 1.", item: itemPost1 });
@@ -180,7 +180,7 @@ Deno.test("Query: _getAllComments - Returns all comments in the database", async
     await commentingConcept.createComment({ user: userAlice, body: "Comment 3.", item: itemPost2 });
     console.log("Created 3 comments.");
 
-    const allComments = await commentingConcept._getAllComments();
+    const allComments = await commentingConcept._getAllComments({});
 
     // effects: returns all posts in db
     assertEquals(allComments.length, 3, "Should return all 3 comments.");
@@ -188,7 +188,7 @@ Deno.test("Query: _getAllComments - Returns all comments in the database", async
     console.log(`Found ${allComments.length} total comments.`);
 });
 
-Deno.test("Principle Trace: User comments on an item and it becomes publically visible", async (t) => {
+Deno.test("Principle Trace: User comments on an item and it becomes publically visible", async () => {
     console.log("--- Principle Trace ---");
 
     // Principle: A user views an item, a post or another comment, and wants to express an opinion on it.
@@ -208,7 +208,7 @@ Deno.test("Principle Trace: User comments on an item and it becomes publically v
 
     // 3. The comment is then publically visible and linked to that item
     // Verify visibility via _getAllComments
-    const allComments = await commentingConcept._getAllComments();
+    const allComments = await commentingConcept._getAllComments({});
     assertEquals(allComments.length, 1, "There should be one comment in the system.");
     assertEquals(allComments[0]._id, newCommentId, "The created comment should be found via _getAllComments.");
     assertEquals(allComments[0].author, viewingUser, "The author should match.");

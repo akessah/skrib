@@ -103,7 +103,7 @@ async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
   /**
    * returns all users
    */
-  async _getAllUsers(): Promise<Users[]> {
+  async _getAllUsers({}): Promise<Users[]> {
     return await this.users.find().toArray();
   }
 }

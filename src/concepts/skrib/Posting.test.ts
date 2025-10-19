@@ -12,7 +12,7 @@ const newBody = "Updated content here.";
 
   // helper function to fetch a post by ID using available queries
 const getPostById = async (postingConcept: PostingConcept, postId: ID) => {
-  const allPosts = await postingConcept._getAllPosts();
+  const allPosts = await postingConcept._getAllPosts({});
   return allPosts.find(p => p._id === postId);
 };
 
@@ -34,7 +34,7 @@ Deno.test("createPost - should create a new post successfully", async () => {
 
     assertEquals(postInDb?.author, userA, "Post author should match the creator");
     assertEquals(postInDb?.body, body1, "Post body should match the provided body");
-    assertEquals((await postingConcept._getAllPosts()).length, 1, "There should be exactly one post in the database");
+    assertEquals((await postingConcept._getAllPosts({})).length, 1, "There should be exactly one post in the database");
 
     await client.close();
 });
@@ -48,7 +48,7 @@ Deno.test("editPost - should update the body of an existing post", async () => {
     const postId = createResult.post;
     console.log(`Trace: createPost to set up for editPost. Post ID: ${postId}`);
 
-    assertEquals((await postingConcept._getAllPosts()).length, 1, "Pre-condition: one post should exist");
+    assertEquals((await postingConcept._getAllPosts({})).length, 1, "Pre-condition: one post should exist");
 
     // edit post
     console.log(`Trace: editPost action for postId ${postId} with newBody.`);
@@ -90,7 +90,7 @@ Deno.test("deletePost - should remove an existing post", async () => {
     const postId = createResult.post;
     console.log(`Trace: createPost to set up for deletePost. Post ID: ${postId}`);
 
-    assertEquals((await postingConcept._getAllPosts()).length, 1, "Pre-condition: one post should exist");
+    assertEquals((await postingConcept._getAllPosts({})).length, 1, "Pre-condition: one post should exist");
 
     //delete post
     console.log(`Trace: deletePost action for postId ${postId}.`);
@@ -103,7 +103,7 @@ Deno.test("deletePost - should remove an existing post", async () => {
     console.log(`  Post found in DB after delete attempt: ${JSON.stringify(postInDb)}`);
 
     assertEquals(postInDb, undefined, "Post should no longer exist in the database");
-    assertEquals((await postingConcept._getAllPosts()).length, 0, "There should be no posts left in the database");
+    assertEquals((await postingConcept._getAllPosts({})).length, 0, "There should be no posts left in the database");
 
     await client.close();
 });
@@ -134,7 +134,7 @@ Deno.test("_getPostsByAuthor - should return all posts by a specific author", as
     const postB1Result = await postingConcept.createPost({ user: userB, body: "Bob's post" });
     console.log(`  Created posts: ${postA1Result.post}, ${postA2Result.post}, ${postB1Result.post}`);
 
-    assertEquals((await postingConcept._getAllPosts()).length, 3, "Pre-condition: 3 posts should exist");
+    assertEquals((await postingConcept._getAllPosts({})).length, 3, "Pre-condition: 3 posts should exist");
 
 
     console.log(`Trace: Calling _getPostsByAuthor for userA (${userA}).`);
@@ -171,10 +171,10 @@ Deno.test("_getAllPosts - should return all posts in the database", async () => 
     await postingConcept.createPost({ user: userA, body: "Post 1" });
     await postingConcept.createPost({ user: userB, body: "Post 2" });
 
-    assertEquals((await postingConcept._getAllPosts()).length, 2, "Pre-condition: 2 posts should exist"); // Reset by previous test, so 2 now
+    assertEquals((await postingConcept._getAllPosts({})).length, 2, "Pre-condition: 2 posts should exist"); // Reset by previous test, so 2 now
 
     console.log("Trace: Calling _getAllPosts.");
-    const allPosts = await postingConcept._getAllPosts();
+    const allPosts = await postingConcept._getAllPosts({});
     console.log(`  All posts found: ${JSON.stringify(allPosts.map(p => ({_id: p._id, author: p.author, body: p.body})))}`);
 
     assertEquals(allPosts.length, 2, "Should return all 2 posts created");
@@ -202,8 +202,8 @@ Deno.test("Principle Test: A user creates and publishes a post which can then be
     // 2. The post is now published and can be seen publicly.
     // We verify this by using _getAllPosts, which represents public visibility.
     console.log(`Trace: [Principle] Verify the post is publicly visible using _getAllPosts.`);
-    const allPublicPosts = await postingConcept._getAllPosts();
-    console.log(`  Query: _getAllPosts() -> ${JSON.stringify(allPublicPosts.map(p => p._id))}`);
+    const allPublicPosts = await postingConcept._getAllPosts({});
+    console.log(`  Query: _getAllPosts({}) -> ${JSON.stringify(allPublicPosts.map(p => p._id))}`);
 
     const foundPost = allPublicPosts.find(p => p._id === principlePostId);
     assertEquals(foundPost !== undefined, true, "The principle post should be found in all public posts");

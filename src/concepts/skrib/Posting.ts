@@ -99,7 +99,7 @@ export default class PostingConcept {
   /**
    * returns all posts in database
    */
-  async _getAllPosts(): Promise<Posts[]> {
+  async _getAllPosts({}): Promise<Posts[]> {
     return await this.posts.find().toArray();
   }
 }

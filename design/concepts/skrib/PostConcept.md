@@ -10,7 +10,7 @@ State:
       a body String
       an author User
 
-actions:
+Actions:
 
     createPost (user: User, body: String):(post:Post)
       effects: creates a post with body by user and adds it to Posts set
@@ -19,9 +19,9 @@ actions:
       effects: removes said post from Posts set
 
     editPost (post: Post, newBody: String):(editedPost: Post)
-        effects: replaces body of post with newBody
+      effects: replaces body of post with newBody
 
-queries:
+Queries:
 
     _getPostsByAuthor(user: User)
       effects: returns posts authored by user

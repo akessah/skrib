@@ -99,7 +99,7 @@ export default class NotifyingConcept {
   /**
    * returns all notifications
    */
-  async _getAllNotifications(): Promise<Notifications[]> {
+  async _getAllNotifications({}): Promise<Notifications[]> {
     return await this.notifications.find().toArray();
   }
 }

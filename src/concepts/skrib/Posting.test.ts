@@ -3,22 +3,22 @@ import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
 import PostingConcept from "./Posting.ts";
 
-Deno.test("PostingConcept", async (t) => {
 
-  // Define some test users and bodies
-  const userA = "user:Alice" as ID;
-  const userB = "user:Bob" as ID;
-  const body1 = "This is my first post!";
-//   const body2 = "Another great thought.";
-  const newBody = "Updated content here.";
+// test users and bodies
+const userA = "user:Alice" as ID;
+const userB = "user:Bob" as ID;
+const body1 = "This is my first post!";
+const newBody = "Updated content here.";
 
-  // A helper function to fetch a post by ID using available queries
-  const getPostById = async (postingConcept: PostingConcept, postId: ID) => {
-    const allPosts = await postingConcept._getAllPosts();
-    return allPosts.find(p => p._id === postId);
-  };
+  // helper function to fetch a post by ID using available queries
+const getPostById = async (postingConcept: PostingConcept, postId: ID) => {
+  const allPosts = await postingConcept._getAllPosts();
+  return allPosts.find(p => p._id === postId);
+};
 
-  await t.step("createPost - should create a new post successfully", async () => {
+
+
+Deno.test("createPost - should create a new post successfully", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
@@ -37,19 +37,20 @@ Deno.test("PostingConcept", async (t) => {
     assertEquals((await postingConcept._getAllPosts()).length, 1, "There should be exactly one post in the database");
 
     await client.close();
-  });
+});
 
-  await t.step("editPost - should update the body of an existing post", async () => {
+Deno.test("editPost - should update the body of an existing post", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
-    // First, create a post to edit
+    // create post
     const createResult = await postingConcept.createPost({ user: userA, body: body1 });
     const postId = createResult.post;
     console.log(`Trace: createPost to set up for editPost. Post ID: ${postId}`);
 
     assertEquals((await postingConcept._getAllPosts()).length, 1, "Pre-condition: one post should exist");
 
+    // edit post
     console.log(`Trace: editPost action for postId ${postId} with newBody.`);
     const editResult = await postingConcept.editPost({ post: postId, newBody: newBody });
     console.log(`  Action result: ${JSON.stringify(editResult)}`);
@@ -63,9 +64,9 @@ Deno.test("PostingConcept", async (t) => {
     assertEquals(postInDb?.author, userA, "Post author should remain unchanged");
 
     await client.close();
-  });
+});
 
-  await t.step("editPost - should return an error if post does not exist", async () => {
+Deno.test("editPost - should return an error if post does not exist", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
@@ -75,22 +76,23 @@ Deno.test("PostingConcept", async (t) => {
     console.log(`  Action result: ${JSON.stringify(result)}`);
 
     assertNotEquals(result.error, undefined, "Expected an error for non-existent post");
-    assertEquals(result.error, `Survey with ID ${nonExistentPostId} not found.`, "Error message should indicate post not found");
+    assertEquals(result.error, `Post with ID ${nonExistentPostId} not found.`, "Error message should indicate post not found");
 
     await client.close();
-  });
+});
 
-  await t.step("deletePost - should remove an existing post", async () => {
+Deno.test("deletePost - should remove an existing post", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
-    // First, create a post to delete
+    // create post
     const createResult = await postingConcept.createPost({ user: userA, body: body1 });
     const postId = createResult.post;
     console.log(`Trace: createPost to set up for deletePost. Post ID: ${postId}`);
 
     assertEquals((await postingConcept._getAllPosts()).length, 1, "Pre-condition: one post should exist");
 
+    //delete post
     console.log(`Trace: deletePost action for postId ${postId}.`);
     const deleteResult = await postingConcept.deletePost({ post: postId });
     console.log(`  Action result: ${JSON.stringify(deleteResult)}`);
@@ -104,9 +106,9 @@ Deno.test("PostingConcept", async (t) => {
     assertEquals((await postingConcept._getAllPosts()).length, 0, "There should be no posts left in the database");
 
     await client.close();
-  });
+});
 
-  await t.step("deletePost - should return an error if post does not exist", async () => {
+Deno.test("deletePost - should return an error if post does not exist", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
@@ -116,12 +118,12 @@ Deno.test("PostingConcept", async (t) => {
     console.log(`  Action result: ${JSON.stringify(result)}`);
 
     assertNotEquals(result.error, undefined, "Expected an error for non-existent post");
-    assertEquals(result.error, `Survey with ID ${nonExistentPostId} not found.`, "Error message should indicate post not found");
+    assertEquals(result.error, `Post with ID ${nonExistentPostId} not found.`, "Error message should indicate post not found");
 
     await client.close();
-  });
+});
 
-  await t.step("_getPostsByAuthor - should return all posts by a specific author", async () => {
+Deno.test("_getPostsByAuthor - should return all posts by a specific author", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
@@ -158,13 +160,13 @@ Deno.test("PostingConcept", async (t) => {
     assertEquals(nonExistentUserPosts.length, 0, "Should return 0 posts for a non-existent user");
 
     await client.close();
-  });
+});
 
-  await t.step("_getAllPosts - should return all posts in the database", async () => {
+Deno.test("_getAllPosts - should return all posts in the database", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
-    // Ensure some posts exist
+    // create posts
     console.log("Trace: Setting up posts for _getAllPosts query.");
     await postingConcept.createPost({ user: userA, body: "Post 1" });
     await postingConcept.createPost({ user: userB, body: "Post 2" });
@@ -180,9 +182,9 @@ Deno.test("PostingConcept", async (t) => {
     assertEquals(allPosts.some(p => p.body === "Post 2"), true, "Post 2 should be included");
 
     await client.close();
-  });
+});
 
-  await t.step("Principle Test: A user creates and publishes a post which can then be seen publically.", async () => {
+Deno.test("Principle Test: A user creates and publishes a post which can then be seen publically.", async () => {
     const [db, client] = await testDb();
     const postingConcept = new PostingConcept(db);
 
@@ -211,6 +213,4 @@ Deno.test("PostingConcept", async (t) => {
     console.log(`Principle fully modeled: The post (ID: ${principlePostId}) created by ${principleUser} with body "${principlePostBody}" is now publically visible.`);
 
     await client.close();
-  });
-
 });

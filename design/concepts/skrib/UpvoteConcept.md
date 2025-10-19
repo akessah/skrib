@@ -10,7 +10,7 @@ State:
       a target Item
       a user User
 
-actions:
+Actions:
 
     upvote (user: User, item: Item):
       requires: no vote by user for item
@@ -19,3 +19,14 @@ actions:
     unvote (user: User, item: Item)
       requires: a vote by user for item exists
       effects: removes said vote from Votes set
+
+Queries:
+
+    _getUpvotessByUser(user: User)
+      effects: returns all upvotes from user
+
+    _getUpvotessByItem(item: Item)
+      effects: returns all upvotes on item
+
+    _getAllUpvotes()
+      effects: returns all upvotes in set

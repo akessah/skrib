@@ -96,7 +96,7 @@ export default class UpvotingConcept {
   /**
    * returns all votes
    */
-  async _getAllUpvotes(): Promise<Votes[]> {
+  async _getAllUpvotes({}): Promise<Votes[]> {
     return await this.votes.find().toArray();
   }
 }

@@ -24,7 +24,7 @@ Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
     console.log("\n--- Test: upvote: successfully adds a vote ---");
 
     // Initial state check
-    const initialVotes = await upvotingConcept._getAllUpvotes();
+    const initialVotes = await upvotingConcept._getAllUpvotes({});
     assertEquals(initialVotes.length, 0, "Initially, no votes should exist.");
     console.log(`Initial votes: ${initialVotes.length}`);
 

@@ -11,7 +11,7 @@ State:
       a message String
       a read flag
 
-actions:
+Actions:
 
     notify (user: User, message: String):(notification:Notification)
       effects: creates a Notification for user with message, adds it to the Notifications set, and returns it to the user
@@ -19,3 +19,17 @@ actions:
     read(notification:Notification):(message: String)
       requires: notification to exist
       effects: marks notification as read regardless of previous read status
+
+Queries:
+
+    _getNotificationsByUser(recipient: User)
+      effects: returns notifications for recipient
+
+    _getReadNotificationsByUser(recipient: User)
+      effects: returns notifications for recipient that are marked read
+
+    _getUnreadNotificationsByUser(recipient: User)
+      effects: returns notifications for recipient that are not marked read
+
+    _getAllNotifications()
+      effects: returns all notifications in set

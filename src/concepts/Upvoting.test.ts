@@ -2,7 +2,7 @@
 import { assertEquals, assertExists, assertNotEquals } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
-import UpvotingConcept from "@concepts/skrib/Upvoting.ts"; // Adjust path if necessary
+import UpvotingConcept from "./UpvotingConcept.ts"; // Adjust path if necessary
 
 Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
 

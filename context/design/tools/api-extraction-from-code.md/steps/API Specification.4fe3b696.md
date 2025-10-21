@@ -1,24 +1,14 @@
-[@api-extraction-from-spec](api-extraction-from-spec.md)
-
-# Extracting from code
-
-The following is an explanation of how concepts are implemented, for the purposes of understanding how to extract an API.
-
-[@implementing-concepts](../background/implementing-concepts.md)
-
-# prompt:
-
-Now, analyze the following Upvoting Implementation and generate the API documentation based on these instructions.
-
-[@Upvoting](../../src/concepts/skrib/Upvoting.ts)
-
-# response:
+---
+timestamp: 'Tue Oct 21 2025 15:22:00 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251021_152200.9dc3cfc0.md]]'
+content_id: 4fe3b6960cbc452cecf35f2356399b2e9264881f363dd213b5c33c6fe633d1d5
+---
 
 # API Specification: Upvoting Concept
 
 **Purpose:** to rank items by popularity
 
----
+***
 
 ## API Endpoints
 
@@ -27,12 +17,15 @@ Now, analyze the following Upvoting Implementation and generate the API document
 **Description:** Adds a user's upvote to an item.
 
 **Requirements:**
-- No vote by `user` for `item` already exists.
+
+* No vote by `user` for `item` already exists.
 
 **Effects:**
-- A vote by `user` for `item` is added to the `Votes` set.
+
+* A vote by `user` for `item` is added to the `Votes` set.
 
 **Request Body:**
+
 ```json
 {
   "user": "ID",
@@ -41,30 +34,35 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Success Response Body (Action):**
+
 ```json
 {}
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
 ### POST /api/Upvoting/unvote
 
 **Description:** Removes a user's upvote from an item.
 
 **Requirements:**
-- A vote by `user` for `item` must exist.
+
+* A vote by `user` for `item` must exist.
 
 **Effects:**
-- The vote by `user` for `item` is removed from the `Votes` set.
+
+* The vote by `user` for `item` is removed from the `Votes` set.
 
 **Request Body:**
+
 ```json
 {
   "user": "ID",
@@ -73,30 +71,35 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Success Response Body (Action):**
+
 ```json
 {}
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Upvoting/_getUpvotessByUser
+### POST /api/Upvoting/\_getUpvotessByUser
 
 **Description:** Returns all votes made by a specific user.
 
 **Requirements:**
-- true
+
+* true
 
 **Effects:**
-- Returns all votes from `user`.
+
+* Returns all votes from `user`.
 
 **Request Body:**
+
 ```json
 {
   "user": "ID"
@@ -104,6 +107,7 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {
@@ -115,25 +119,29 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Upvoting/_getUpvotesByItem
+### POST /api/Upvoting/\_getUpvotesByItem
 
 **Description:** Returns all votes associated with a specific item.
 
 **Requirements:**
-- true
+
+* true
 
 **Effects:**
-- Returns all votes on an `item`.
+
+* Returns all votes on an `item`.
 
 **Request Body:**
+
 ```json
 {
   "item": "ID"
@@ -141,6 +149,7 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {
@@ -159,24 +168,28 @@ Now, analyze the following Upvoting Implementation and generate the API document
 }
 ```
 
----
+***
 
-### POST /api/Upvoting/_getAllUpvotes
+### POST /api/Upvoting/\_getAllUpvotes
 
 **Description:** Returns all votes in the system.
 
 **Requirements:**
-- true
+
+* true
 
 **Effects:**
-- Returns all votes.
+
+* Returns all votes.
 
 **Request Body:**
+
 ```json
 {}
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {

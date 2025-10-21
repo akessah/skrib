@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
-import AuthenticationConcept from "./Authentication.ts";
+import AuthenticationConcept from "./AuthenticationConcept.ts";
 import { ID } from "@utils/types.ts";
 
 Deno.test("Authentication Concept", async (t) => {

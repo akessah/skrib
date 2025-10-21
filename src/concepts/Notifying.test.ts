@@ -5,7 +5,7 @@
 import { assertEquals, assertExists } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
-import NotifyingConcept from "./Notifying.ts";
+import NotifyingConcept from "./NotifyingConcept.ts";
 
 // Helper function for user IDs
 const userA = "user:Alice" as ID;

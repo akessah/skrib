@@ -2,7 +2,7 @@ import { assertEquals, assertExists, assertNotEquals } from "jsr:@std/assert";
 import { MongoClient, Db } from "npm:mongodb";
 import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
-import TaggingConcept from "./Tagging.ts"; // Corrected import path and class name
+import TaggingConcept from "./TaggingConcept.ts"; // Corrected import path and class name
 
 // Define test IDs
 const userA = "user:Alice" as ID;

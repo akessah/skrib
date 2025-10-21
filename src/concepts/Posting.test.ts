@@ -1,7 +1,7 @@
 import { assertEquals, assertNotEquals } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
-import PostingConcept from "./Posting.ts";
+import PostingConcept from "./PostingConcept.ts";
 
 
 // test users and bodies

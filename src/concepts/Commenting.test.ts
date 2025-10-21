@@ -1,7 +1,7 @@
 import { assertEquals, assertNotEquals, assertArrayIncludes } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import { ID } from "@utils/types.ts";
-import CommentingConcept from "./Commenting.ts"; // Assuming the file is named Commenting.ts
+import CommentingConcept from "./CommentingConcept.ts"; // Assuming the file is named Commenting.ts
 import { Db, MongoClient } from "npm:mongodb"; // <--- Add these imports for MongoDB types
 
 // Define specific ID types for better readability in tests

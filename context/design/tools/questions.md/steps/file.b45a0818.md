@@ -1,5 +1,14 @@
+---
+timestamp: 'Tue Oct 21 2025 18:39:20 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251021_183920.640f5e25.md]]'
+content_id: b45a08188e2dc2f6186e936f5d8c51d7a120501ebf5005eefd3a2ff60130b5de
+---
+
+# file: src\concept\_server.ts
+
+```typescript
 import { Hono } from "jsr:@hono/hono";
-import { cors } from "@hono/hono/cors";
+import { cors } from "jsr:@hono/cors"; // NEW: Import CORS middleware
 import { getDb } from "@utils/database.ts";
 import { walk } from "jsr:@std/fs";
 import { parseArgs } from "jsr:@std/cli/parse-args";
@@ -116,3 +125,5 @@ async function main() {
 
 // Run the server
 main();
+
+```

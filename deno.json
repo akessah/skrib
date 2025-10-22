@@ -1,6 +1,7 @@
 {
     "imports": {
         "@concepts/": "./src/concepts/",
+        "@hono/hono": "jsr:@hono/hono@^4.10.1",
         "@utils/": "./src/utils/"
     },
     "tasks": {

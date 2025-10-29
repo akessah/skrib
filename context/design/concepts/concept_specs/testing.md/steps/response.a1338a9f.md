@@ -1,30 +1,19 @@
-[@implementation](../../../src/concepts/Shelving/Shelving.ts)
-
-[@concept](../concept_specs/ShelfConcept.md)
-
-[@testing-concepts](../../background/testing-concepts.md)
-
-# error
-Concept: Shelving => ./Shelving.test.ts:6:6
-error: Error: Could not find environment variable: MONGODB_URL
-    throw new Error("Could not find environment variable: MONGODB_URL");
-          ^
-    at initMongoClient (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:10:11)
-    at init (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:22:24)
-    at testDb (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:59:35)
-    at file:///C:/Users/Akosua/Documents/6.104/skrib/src/concepts/shelving/Shelving.test.ts:7:32
-# prompt: why do I get this error when I try to run the test?
+---
+timestamp: 'Tue Oct 28 2025 21:14:54 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251028_211454.e1d55d4b.md]]'
+content_id: a1338a9f2119ba54866c7515289f7593c192be49a8474421e3625782a358ed5f
+---
 
 # response:
 
 The error message `Error: Could not find environment variable: MONGODB_URL` and the stack trace clearly indicate two potential issues when running your Deno test:
 
-1.  **Deno Permissions:** Deno, by default, runs with a secure sandbox and does not allow access to environment variables unless explicitly granted permission.
-2.  **Environment Variable Not Set:** The `MONGODB_URL` environment variable is genuinely not set in the shell or system where you are running the test.
+1. **Deno Permissions:** Deno, by default, runs with a secure sandbox and does not allow access to environment variables unless explicitly granted permission.
+2. **Environment Variable Not Set:** The `MONGODB_URL` environment variable is genuinely not set in the shell or system where you are running the test.
 
 Let's break down how to fix this:
 
----
+***
 
 ### 1. **Grant Deno Permission to Access Environment Variables (`--allow-env`)**
 
@@ -39,7 +28,7 @@ Deno requires explicit permission to read environment variables. You need to add
 **Additionally:** Since you're connecting to a database over the network, you'll also need the `--allow-net` flag:
 `deno test --allow-env --allow-net src/concepts/shelving/Shelving.test.ts`
 
----
+***
 
 ### 2. **Ensure `MONGODB_URL` Environment Variable is Set**
 
@@ -50,28 +39,32 @@ You need to set this environment variable before running your Deno test. Replace
 **How to set it (choose one based on your OS and preference):**
 
 **a) For the current terminal session (Linux/macOS):**
+
 ```bash
 export MONGODB_URL="your_mongodb_connection_string"
 deno test --allow-env --allow-net src/concepts/shelving/Shelving.test.ts
 ```
 
 **b) For the current terminal session (Windows Command Prompt):**
+
 ```cmd
 set MONGODB_URL="your_mongodb_connection_string"
 deno test --allow-env --allow-net src/concepts/shelving/Shelving.test.ts
 ```
 
 **c) For the current terminal session (Windows PowerShell):**
+
 ```powershell
 $env:MONGODB_URL="your_mongodb_connection_string"
 deno test --allow-env --allow-net src/concepts/shelving/Shelving.test.ts
 ```
 
 **d) Persistently (recommended for development):**
-   *   **Linux/macOS:** Add `export MONGODB_URL="your_mongodb_connection_string"` to your shell's configuration file (e.g., `~/.bashrc`, `~/.zshrc`, `~/.profile`), then restart your terminal or run `source ~/.bashrc` (or equivalent).
-   *   **Windows:** Set it via the System Environment Variables GUI (Search "Environment Variables" in Start Menu -> Edit the system environment variables -> Environment Variables... -> New under "System variables" or "User variables").
 
----
+* **Linux/macOS:** Add `export MONGODB_URL="your_mongodb_connection_string"` to your shell's configuration file (e.g., `~/.bashrc`, `~/.zshrc`, `~/.profile`), then restart your terminal or run `source ~/.bashrc` (or equivalent).
+* **Windows:** Set it via the System Environment Variables GUI (Search "Environment Variables" in Start Menu -> Edit the system environment variables -> Environment Variables... -> New under "System variables" or "User variables").
+
+***
 
 **In summary, the most common solution is to run your test with both necessary Deno flags and ensure the `MONGODB_URL` is correctly set in your environment:**
 

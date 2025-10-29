@@ -1,189 +1,201 @@
-[@api-extraction-from-spec](api-extraction-from-spec.md)
-
-# Extracting from code
-
-The following is an explanation of how concepts are implemented, for the purposes of understanding how to extract an API.
-
-[@implementing-concepts](../background/implementing-concepts.md)
-
-# prompt:
-
-Now, analyze the following Upvoting Implementation and generate the API documentation based on these instructions.
-
-[@Shelving](../../src/concepts/Shelving/Shelving.ts)
-
-# response:
+---
+timestamp: 'Tue Oct 28 2025 21:18:29 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251028_211829.6336ef5d.md]]'
+content_id: 32c8e3df9de82e259a472795dc9fd6dca21f7866bc0917934e9f90b4ba5d3133
+---
 
 # API Specification: Shelving Concept
 
 **Purpose:** to label books to assist in searching and organization
 
----
+***
 
 ## API Endpoints
 
 ### POST /api/Shelving/addBook
 
-**Description:** Adds a book to the given shelf
+**Description:** Adds a book to the given shelf.
 
 **Requirements:**
-- book is not on any of the user's shelves
+
+* book is not on any of the user's shelves
 
 **Effects:**
-- adds book to the shelf specified, 0 means want to read, 1 means currently reading, 2 means read, 3 means did not finish
+
+* adds book to the shelf specified
 
 **Request Body:**
+
 ```json
 {
-  "user": "ID",
+  "user": "string",
   "status": "number",
-  "book": "ID"
+  "book": "string"
 }
 ```
 
 **Success Response Body (Action):**
+
 ```json
 {
-  "shelf": "ID"
+  "shelf": "string"
 }
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
 ### POST /api/Shelving/removeBook
 
-**Description:** Removes a book from the given shelf
+**Description:** Removes a book from the given shelf.
 
 **Requirements:**
-- book is on a shelf
+
+* book is on a shelf
 
 **Effects:**
-- removes book from shelf
+
+* removes book from shelf
 
 **Request Body:**
+
 ```json
 {
-  "shelf": "ID"
+  "shelf": "string"
 }
 ```
 
 **Success Response Body (Action):**
+
 ```json
 {}
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
 ### POST /api/Shelving/changeStatus
 
-**Description:** Moves book to a different shelf
+**Description:** Moves book to a different shelf.
 
 **Requirements:**
-- book is on a shelf
+
+* book is on a shelf
 
 **Effects:**
-- moves book to the shelf specified by the user
+
+* moves book to the shelf specified by the user
 
 **Request Body:**
+
 ```json
 {
-  "shelf": "ID",
+  "shelf": "string",
   "newStatus": "number"
 }
 ```
 
 **Success Response Body (Action):**
+
 ```json
 {}
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Shelving/_getUserShelfByBook
+### POST /api/Shelving/getUserShelfByBook
 
-**Description:** returns status user added to book
+**Description:** returns status user added to book.
 
 **Requirements:**
-- None.
+
+* None specified.
 
 **Effects:**
-- None.
+
+* None specified.
 
 **Request Body:**
+
 ```json
 {
-  "user": "ID",
-  "book": "ID"
+  "user": "string",
+  "book": "string"
 }
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
-  {
-    "status": "number"
-  }
+  "number"
 ]
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Shelving/_getShelvesByBook
+### POST /api/Shelving/getShelvesByBook
 
-**Description:** returns all Shelves added to book, grouped by status
+**Description:** returns all Shelves added to book, grouped by status.
 
 **Requirements:**
-- None.
+
+* None specified.
 
 **Effects:**
-- None.
+
+* None specified.
 
 **Request Body:**
+
 ```json
 {
-  "book": "ID"
+  "book": "string"
 }
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {
     "status": "number",
     "shelves": [
       {
-        "_id": "ID",
-        "user": "ID",
+        "_id": "string",
+        "user": "string",
         "status": "number",
-        "book": "ID"
+        "book": "string"
       }
     ]
   }
@@ -191,78 +203,88 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Shelving/_getBooksByUser
+### POST /api/Shelving/getBooksByUser
 
-**Description:** returns all books user has shelved, grouped by status
+**Description:** returns all books user has shelved, grouped by status.
 
 **Requirements:**
-- None.
+
+* None specified.
 
 **Effects:**
-- None.
+
+* None specified.
 
 **Request Body:**
+
 ```json
 {
-  "user": "ID"
+  "user": "string"
 }
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {
     "status": "number",
     "shelves": [
-      "ID"
+      "string"
     ]
   }
 ]
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
 
----
+***
 
-### POST /api/Shelving/_getAllShelves
+### POST /api/Shelving/getAllShelves
 
-**Description:** returns all Shelves in set, grouped by status
+**Description:** returns all Shelves in set, grouped by status.
 
 **Requirements:**
-- None.
+
+* None specified.
 
 **Effects:**
-- None.
+
+* None specified.
 
 **Request Body:**
+
 ```json
 {}
 ```
 
 **Success Response Body (Query):**
+
 ```json
 [
   {
     "status": "number",
     "shelves": [
       {
-        "_id": "ID",
-        "user": "ID",
+        "_id": "string",
+        "user": "string",
         "status": "number",
-        "book": "ID"
+        "book": "string"
       }
     ]
   }
@@ -270,10 +292,9 @@ Now, analyze the following Upvoting Implementation and generate the API document
 ```
 
 **Error Response Body:**
+
 ```json
 {
   "error": "string"
 }
 ```
-
----

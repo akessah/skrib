@@ -26,3 +26,10 @@ Most of the design decisions I made throughout the project are in the files for 
 - Tagging
   - Of all the concepts, this was the one I had to modify the most from assignment 2, mostly because the main thing that makes tagging interesting is the type of queries you can do with it and I originally didn't have any queries. The hardest part about implementing this was deciding what exactly I wanted to return with the queries, should it be tags (which are unique) or labels (which aren't), but I ultimately just decided to do two versions of certain queries, one that just returns a list of the tag objects and one that will return labels with a count of how many tags have that label
   - [Implementation of tagging](skrib\context\src\concepts\skrib\Tagging.ts\20251019_105329.ffa75414.md)
+
+# Assignment 4b Changes #
+There were two big changes I made to the backend over the course of this assignment.
+
+- Creating a Shelf Concept: Originally, I was going to let users use Tags to mark books as read, want to read, currently reading, ect, but I realized this conflated 2 different purposes in one concept. I decided to create a new Shelving concept to implement this functionality, which made it easier to display tags and reading status separately in the final application.
+
+- Altering _getBooksByTags action in Tag Concept: When searching books with multiple tags, I was originally going to let the user choose whether search results should have all of the tags, or just at least one. I changed the specification to just have results with all the tags, mostly because it made google books api calls easier.

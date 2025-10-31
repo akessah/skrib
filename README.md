@@ -4,10 +4,13 @@ In this assignment, you'll begin creating your backend by implementing your conc
 
 # Assignment 4 Deliverable Links
 
-- [Spec files](skrib\design\concepts\concept_specs)
-- [Implementation and test files](skrib\src\concepts\skrib)
-- [Console Outputs](skrib\design\concepts\test_outputs)
-- [Design Files](skrib\design\concepts\design_files)
+- [Spec files](design\concepts\concept_specs)
+- [Implementation and test files](src\concepts\skrib)
+- [Console Outputs](design\concepts\test_outputs)
+- [Design Files](design\concepts\design_files)
+
+# Assignment 4b Updated Design File
+[Overall Design File](design\concepts\design_files\overall_project.md)
 
 
 

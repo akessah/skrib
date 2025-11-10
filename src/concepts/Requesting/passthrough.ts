@@ -26,11 +26,47 @@
 
 export const inclusions: Record<string, string> = {
   // Feel free to delete these example inclusions
-  "/api/LikertSurvey/_getSurveyQuestions": "this is a public query",
-  "/api/LikertSurvey/_getSurveyResponses": "responses are public",
-  "/api/LikertSurvey/_getRespondentAnswers": "answers are visible",
-  "/api/LikertSurvey/submitResponse": "allow anyone to submit response",
-  "/api/LikertSurvey/updateResponse": "allow anyone to update their response",
+  "/api/Sessioning/create": "",
+  "/api/Sessioning/delete": "",
+  "/api/Sessioning/_getUser": "",
+
+  "/api/Authentication/register":"",
+ "/api/Authentication/deleteUser":"",
+ "/api/Authentication/changePassword":"",
+ "/api/Authentication/authenticate":"",
+ "/api/Authentication/_getAllUsers":"",
+
+  "/api/Commenting/_getCommentsByAuthor": "",
+  "/api/Commenting/_getCommentsByParent": "",
+  "/api/Commenting/_getAllComments": "",
+  "/api/Commenting/_getParent": "",
+  "/api/Commenting/_getAuthor": "",
+
+  "/api/Notifying/_getNotificationsByUser": "",
+  "/api/Notifying/_getReadNotificationsByUser": "",
+  "/api/Notifying/_getUnreadNotificationsByUser": "",
+  "/api/Notifying/_getAllNotifications": "",
+
+  "/api/Posting/_getPostsByAuthor":"",
+  "/api/Posting/_getAllPosts":"",
+  "/api/Posting/_getAuthor":"",
+
+  "/api/Shelving/_getUserShelfByBook":"",
+  "/api/Shelving/_getShelvesByBook":"",
+  "/api/Shelving/_getBooksByUser":"",
+  "/api/Shelving/_getAllShelves":"",
+
+  "/api/Tagging/_getAllPublicTags": "public query",
+  "/api/Tagging/_getTagsByBook":"",
+  "/api/Tagging/_getLabelsByBook":"",
+  "/api/Tagging/_getBooksByLabel":"",
+  "/api/Tagging/_getTagsByUser":"",
+  "/api/Tagging/_getLabelsByUser":"",
+  "/api/Tagging/_getAllTags":"",
+
+  "/api/Upvoting/_getUpvotessByUser":"",
+  "/api/Upvoting/_getUpvotesByItem":"",
+  "/api/Upvoting/_getAllUpvotes":""
 };
 
 /**
@@ -45,6 +81,29 @@ export const inclusions: Record<string, string> = {
 
 export const exclusions: Array<string> = [
   // Feel free to delete these example exclusions
-  "/api/LikertSurvey/createSurvey",
-  "/api/LikertSurvey/addQuestion",
+
+
+ "/api/Commenting/createComment",
+ "/api/Commenting/deleteComment",
+ "/api/Commenting/editComment",
+
+ "/api/Notifying/notify",
+ "/api/Notifying/read",
+
+ "/api/Posting/createPost",
+ "/api/Posting/deletePost",
+ "/api/Posting/editPost",
+
+ "/api/Shelving/addBook",
+ "/api/Shelving/removeBook",
+ "/api/Shelving/changeStatus",
+
+ "/api/Tagging/addTag",
+ "/api/Tagging/removeTag",
+ "/api/Tagging/markPrivate",
+ "/api/Tagging/markPublic",
+
+ "/api/Upvoting/upvote",
+ "/api/Upvoting/unvote",
+
 ];

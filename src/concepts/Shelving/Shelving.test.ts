@@ -1,6 +1,6 @@
 import { assertEquals, assertNotEquals, assertArrayIncludes } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
-import ShelvingConcept from "./Shelving.ts";
+import ShelvingConcept from "./ShelvingConcept.ts";
 import { ID } from "@utils/types.ts";
 
 Deno.test("Concept: Shelving", async (t) => {

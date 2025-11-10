@@ -96,7 +96,8 @@ export default class CommentingConcept {
    * returns all comments created by author
    */
   async _getCommentsByAuthor({ author }: { author: User }): Promise<Comments[]> {
-    return await this.comments.find({ author }).toArray();
+    const authorCOmments = await this.comments.find({ author }).toArray();
+    return authorCOmments
   }
 
 
@@ -112,5 +113,25 @@ export default class CommentingConcept {
    */
   async _getAllComments({}): Promise<Comments[]> {
     return await this.comments.find().toArray();
+  }
+
+  /**
+   * returns parent of comment
+   */
+  async _getParent({comment}: {comment: Comment}): Promise<{parent: Item}[]>{
+    const commentInDB = await this.comments.findOne({_id: comment});
+
+    console.log(`parent: ${commentInDB !== null? commentInDB.parent: null}`);
+    return commentInDB !== null? [{parent: commentInDB.parent}]:[]
+
+  }
+
+  /**
+   * returns author of comment
+   */
+  async _getAuthor({comment}: {comment:Comment}): Promise<{author: User}[]>{
+    const commentInDB = await this.comments.findOne({_id: comment});
+
+    return commentInDB !== null? [{author: commentInDB.author}]:[]
   }
 }

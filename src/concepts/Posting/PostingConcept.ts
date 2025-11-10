@@ -62,6 +62,7 @@ export default class PostingConcept {
    * @effects removes post from Posts set
    */
   async deletePost({ post }: { post: Post;}): Promise<Empty|{error: string}> {
+    console.log(`post id: ${post}`);
     const existingPost = await this.posts.findOne({ _id: post });
     if (!existingPost) {
       return { error: `Post with ID ${post} not found.` };
@@ -91,12 +92,12 @@ export default class PostingConcept {
   /**
    * Deletes all posts in set
    */
-  async deleteAllPosts({}): Promise<Empty>{
-    for (const post of await this._getAllPosts({})){
-      await this.posts.deleteOne({_id: post._id});
-    }
-    return {};
-  }
+  // async deleteAllPosts({}): Promise<Empty>{
+  //   for (const post of await this._getAllPosts({})){
+  //     await this.posts.deleteOne({_id: post._id});
+  //   }
+  //   return {};
+  // }
 
 
   /**
@@ -111,5 +112,16 @@ export default class PostingConcept {
    */
   async _getAllPosts({}): Promise<Posts[]> {
     return await this.posts.find().toArray();
+  }
+
+  /**
+   * returns author of post
+   */
+  async _getAuthor({post}: {post:Post}): Promise<{author: User}[]>{
+    console.log(`looking for post with id ${post}`);
+    const postInDB = await this.posts.findOne({_id: post});
+    console.log(`post: ${postInDB}`);
+
+    return postInDB !== null? [{author: postInDB.author}]:[]
   }
 }

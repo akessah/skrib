@@ -1,0 +1,157 @@
+// These two help you declare synchronizations
+import { actions, Sync } from "@engine";
+import { Posting, Commenting, Notifying, Requesting } from "@concepts";
+
+
+//Creating comments
+export const CreateCommentRequest: Sync = (
+  { request, user, body, item },
+) => ({
+  when: actions([
+    Requesting.request,
+    { path: "/Commenting/createComment", user, body, item },
+    { request },
+  ]),
+  then: actions([Commenting.createComment, {
+    user,
+    body,
+    item
+  }]),
+});
+
+export const CreateCommentResponse: Sync = (
+  { request, comment },
+) => ({
+  when: actions([Requesting.request, { path: "/Commenting/createComment"}, { request },],
+    [Commenting.createComment, {}, {comment}]
+  ),
+  then: actions([Requesting.respond, {
+    request,
+    comment,
+  }]),
+});
+
+
+//Deleting Comments
+export const DeleteCommentRequest: Sync = (
+  { request, comment },
+) => ({
+  when: actions([
+    Requesting.request,
+    { path: "/Commenting/deleteComment", comment },
+    { request },
+  ]),
+  then: actions([Commenting.deleteComment, {
+    comment
+  }]),
+});
+
+export const DeleteCommentSuccessResponse: Sync = (
+  { request },
+) => ({
+  when: actions([Requesting.request, { path: "/Commenting/deleteComment"}, { request },],
+    [Commenting.deleteComment, {}, {}]
+  ),
+  then: actions([Requesting.respond, {
+    request,
+    status: "Comment successfully deleted"
+  }]),
+});
+
+export const DeleteCommentFailureResponse: Sync = (
+  { request, error },
+) => ({
+  when: actions([Requesting.request, { path: "/Commenting/deleteComment"}, { request },],
+    [Commenting.deleteComment, {}, {error}]
+  ),
+  then: actions([Requesting.respond, {
+    request,
+    error
+  }]),
+});
+
+//Editing Comments
+export const EditCommentRequest: Sync = (
+  { request, comment, newBody },
+) => ({
+  when: actions([
+    Requesting.request,
+    { path: "/Commenting/editComment", comment, newBody },
+    { request },
+  ]),
+  then: actions([Commenting.editComment, {
+    comment, newBody
+  }]),
+});
+
+
+export const EditCommentSuccessResponse: Sync = (
+  { request },
+) => ({
+  when: actions([Requesting.request, { path: "/Commenting/editComment"}, { request },],
+    [Commenting.editComment, {}, {}]
+  ),
+  then: actions([Requesting.respond, {
+    request,
+    status: "Comment successfully edited"
+  }]),
+});
+
+export const EditCommentFailureResponse: Sync = (
+  { request, error },
+) => ({
+  when: actions([Requesting.request, { path: "/Commenting/editComment"}, { request },],
+    [Commenting.editComment, {}, {error}]
+  ),
+  then: actions([Requesting.respond, {
+    request,
+    error
+  }]),
+});
+
+
+//Notification Syncs
+export const NotifyWhenGetCommentonPost: Sync = ({ comment, parent, author }) => ({
+    when: actions(
+        [Commenting.createComment, { }, { comment }],
+    ),
+    where: async (frames) => {
+        frames = await frames.query(Commenting._getParent, {comment}, { parent })
+        console.log(frames);
+        frames = await frames.query(Posting._getAuthor, {post: parent}, {author})
+        console.log(frames);
+        return frames;
+    },
+    then: actions(
+        [Notifying.notify, { message: "You got a comment!", user: author }],
+    ),
+});
+
+export const NotifyWhenGetCommentonComment: Sync = ({ user, body, item, comment, parent, author }) => ({
+    when: actions(
+        [Commenting.createComment, { user, body, item }, { comment }],
+    ),
+    where: async (frames) => {
+        frames = await frames.query(Commenting._getParent, {comment}, { parent });
+        frames = await frames.query(Commenting._getAuthor, {comment: parent}, {author});
+        return frames;
+    },
+    then: actions(
+        [Notifying.notify, { message: "You got a comment!", user: author }],
+    ),
+});
+
+export const DeleteCommentsOnCOmmentDeletion: Sync = ({ post, comment }) => ({
+    when: actions(
+        [Commenting.deleteComment, { comment }, {}],
+    ),
+    where: async (frames) => {
+        frames = await frames.query( Commenting._getCommentsByParent, { parent: comment }, { _id: comment });
+        return frames;
+    },
+    then: actions(
+        // For each frame that made it through the 'where' clause (i.e., for each comment found),
+        // delete that specific comment.
+        [Commenting.deleteComment, { comment }],
+    ),
+});

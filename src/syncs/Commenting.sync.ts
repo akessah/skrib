@@ -1,17 +1,21 @@
 // These two help you declare synchronizations
 import { actions, Sync } from "@engine";
-import { Posting, Commenting, Notifying, Requesting } from "@concepts";
+import { Posting, Commenting, Notifying, Requesting, Sessioning } from "@concepts";
 
 
 //Creating comments
 export const CreateCommentRequest: Sync = (
-  { request, user, body, item },
+  { request, user, body, item, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Commenting/createComment", user, body, item },
+    { path: "/Commenting/createComment", body, item, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        return frames;
+    },
   then: actions([Commenting.createComment, {
     user,
     body,
@@ -34,13 +38,18 @@ export const CreateCommentResponse: Sync = (
 
 //Deleting Comments
 export const DeleteCommentRequest: Sync = (
-  { request, comment },
+  { request, comment, session, user, author },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Commenting/deleteComment", comment },
+    { path: "/Commenting/deleteComment", comment, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Commenting._getAuthor, {comment}, {author});
+        return frames.filter(($) => $[author] == $[user]);
+    },
   then: actions([Commenting.deleteComment, {
     comment
   }]),
@@ -72,13 +81,19 @@ export const DeleteCommentFailureResponse: Sync = (
 
 //Editing Comments
 export const EditCommentRequest: Sync = (
-  { request, comment, newBody },
+  { request, comment, newBody, session, user, author },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Commenting/editComment", comment, newBody },
+    { path: "/Commenting/editComment", session, comment, newBody },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Commenting._getAuthor, {comment}, {author});
+        return frames.filter(($) => $[author] == $[user]);
+
+    },
   then: actions([Commenting.editComment, {
     comment, newBody
   }]),

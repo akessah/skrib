@@ -106,4 +106,9 @@ async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
   async _getAllUsers({}): Promise<Users[]> {
     return await this.users.find().toArray();
   }
+
+  async _getUsername({user}: {user: User}): Promise<{username: string}[]>{
+    const userInDb = await this.users.findOne({_id: user});
+    return userInDb? [{username: userInDb.username}]:[]
+  }
 }

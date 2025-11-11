@@ -2,17 +2,20 @@
 import { actions, Sync } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
-import { Requesting, Tagging } from "@concepts";
+import { Requesting, Tagging, Sessioning } from "@concepts";
 
-
+//Add tag
 export const AddTagRequest: Sync = (
-  { request, user, label, book },
+  { request, user, label, book, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Tagging/addTag", user, label, book },
+    { path: "/Tagging/addTag", label, book, session },
     { request },
   ]),
+  where: async (frames) => {
+        return await frames.query( Sessioning._getUser, { session }, { user });
+    },
   then: actions([Tagging.addTag, {
     user,
     label,
@@ -44,14 +47,21 @@ export const AddTagFailureResponse: Sync = (
   }]),
 });
 
+
+//Remove tag
 export const RemoveTag: Sync = (
-  { request, tag },
+  { request, tag, session, user, owner },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Tagging/removeTag", tag },
+    { path: "/Tagging/removeTag", tag, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query(Tagging._getTagOwner, { tag }, { owner });
+        return frames.filter(($) => $[owner] == $[user]);
+    },
   then: actions([Tagging.removeTag, {
     tag
   }]),
@@ -81,14 +91,21 @@ export const RemoveTagFailureResponse: Sync = (
   }]),
 });
 
+
+//Make private
 export const MarkPrivateRequest: Sync = (
-  { request, tag },
+  { request, tag, session, user, owner },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Tagging/markPrivate", tag },
+    { path: "/Tagging/markPrivate", tag, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query(Tagging._getTagOwner, { tag }, { owner });
+        return frames.filter(($) => $[owner] == $[user]);
+    },
   then: actions([Tagging.markPrivate, {
     tag
   }]),
@@ -118,14 +135,21 @@ export const MarkPrivateFailureResponse: Sync = (
   }]),
 });
 
+
+//make public
 export const MarkPublicRequest: Sync = (
-  { request, tag },
+  { request, tag, owner, session, user },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Tagging/markPublic", tag },
+    { path: "/Tagging/markPublic", tag,session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query(Tagging._getTagOwner, { tag }, { owner });
+        return frames.filter(($) => $[owner] == $[user]);
+    },
   then: actions([Tagging.markPublic, {
     tag
   }]),

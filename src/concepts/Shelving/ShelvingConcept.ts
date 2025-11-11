@@ -163,4 +163,14 @@ export default class ShelvingConcept {
         return groupedShelves;
     }
 
+    async _getShelfOwner({shelf}: {shelf: Shelf}): Promise<{owner: User}[]>{
+        const shelfInDB = await this.shelves.findOne({_id: shelf});
+        return shelfInDB? [{owner: shelfInDB.user}]:[];
+    }
+
+    async _getShelfByBookAndOwner({book, owner}: {book: Book, owner: User}): Promise<{shelf: Shelf}[]>{
+        const shelfInDB = await this.shelves.findOne({book, user: owner});
+        return shelfInDB? [{shelf: shelfInDB._id}]:[];
+    }
+
 }

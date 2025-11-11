@@ -24,6 +24,7 @@ interface Comments {
   parent: Item;
   author: User;
   body: string;
+  date: Date;
 }
 
 
@@ -53,6 +54,7 @@ export default class CommentingConcept {
       parent: item,
       author: user,
       body,
+      date: new Date(),
     });
     return { comment: commentId };
   }

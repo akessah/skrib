@@ -2,17 +2,20 @@
 import { actions, Sync } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
-import { Requesting, Shelving } from "@concepts";
+import { Requesting, Shelving, Sessioning } from "@concepts";
 
-
+//Add book
 export const AddBookRequest: Sync = (
-  { request, user, status, book },
+  { request, user, status, book, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Shelving/addBook", user, status, book },
+    { path: "/Shelving/addBook", status, book, session },
     { request },
   ]),
+  where: async (frames) => {
+        return await frames.query( Sessioning._getUser, { session }, { user });
+    },
   then: actions([Shelving.addBook, {
     user,
     status,
@@ -44,14 +47,20 @@ export const AddBookFailureResponse: Sync = (
   }]),
 });
 
+//Remove book
 export const RemoveBookRequest: Sync = (
-  { request, shelf },
+  { request, shelf, session, user, owner },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Shelving/removeBook", shelf },
+    { path: "/Shelving/removeBook", shelf, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query(Shelving._getShelfOwner, { shelf }, { owner });
+        return frames.filter(($) => $[owner] == $[user]);
+    },
   then: actions([Shelving.removeBook, {
     shelf
   }]),
@@ -81,14 +90,20 @@ export const RemoveBookFailureResponse: Sync = (
   }]),
 });
 
+//Change status
 export const ChangeStatusRequest: Sync = (
-  { request, shelf, newStatus },
+  { request, shelf, newStatus, session, user, owner },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Shelving/changeStatus", shelf, newStatus },
+    { path: "/Shelving/changeStatus", shelf, newStatus, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query(Shelving._getShelfOwner, { shelf }, { owner });
+        return frames.filter(($) => $[owner] == $[user]);
+    },
   then: actions([Shelving.changeStatus, {
     shelf, newStatus
   }]),

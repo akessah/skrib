@@ -102,4 +102,9 @@ export default class NotifyingConcept {
   async _getAllNotifications({}): Promise<Notifications[]> {
     return await this.notifications.find().toArray();
   }
+
+  async _getRecipient({notification}: {notification: Notification}): Promise<{recipient: User}[]>{
+    const notifInDB = await this.notifications.findOne({_id: notification})
+    return notifInDB? [{recipient: notifInDB.recipient}]:[]
+  }
 }

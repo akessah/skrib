@@ -56,10 +56,10 @@ export const DeleteCommentRequest: Sync = (
 });
 
 export const DeleteCommentSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Commenting/deleteComment"}, { request },],
-    [Commenting.deleteComment, {}, {}]
+    [Commenting.deleteComment, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -101,10 +101,10 @@ export const EditCommentRequest: Sync = (
 
 
 export const EditCommentSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Commenting/editComment"}, { request },],
-    [Commenting.editComment, {}, {}]
+    [Commenting.editComment, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -138,7 +138,7 @@ export const NotifyWhenGetCommentonPost: Sync = ({ comment, parent, author }) =>
         return frames;
     },
     then: actions(
-        [Notifying.notify, { message: "You got a comment!", user: author }],
+        [Notifying.notify, { message: `You got a comment!` , user: author, post: parent }],
     ),
 });
 
@@ -152,16 +152,16 @@ export const NotifyWhenGetCommentonComment: Sync = ({ user, body, item, comment,
         return frames;
     },
     then: actions(
-        [Notifying.notify, { message: "You got a comment!", user: author }],
+        [Notifying.notify, { message: "You got a comment!", user: author, post: parent }],
     ),
 });
 
-export const DeleteCommentsOnCOmmentDeletion: Sync = ({ post, comment }) => ({
+export const DeleteCommentsOnCOmmentDeletion: Sync = ({ parent, comment }) => ({
     when: actions(
-        [Commenting.deleteComment, { comment }, {}],
+        [Commenting.deleteComment, { comment: parent }, {}],
     ),
     where: async (frames) => {
-        frames = await frames.query( Commenting._getCommentsByParent, { parent: comment }, { _id: comment });
+        frames = await frames.query( Commenting._getCommentsByParent, { parent: parent }, { _id: comment });
         return frames;
     },
     then: actions(

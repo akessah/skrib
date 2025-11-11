@@ -63,7 +63,7 @@ export default class PostingConcept {
    * @requires post exists
    * @effects removes post from Posts set
    */
-  async deletePost({ post }: { post: Post;}): Promise<Empty|{error: string}> {
+  async deletePost({ post }: { post: Post;}): Promise<{success: string}|{error: string}> {
     console.log(`post id: ${post}`);
     const existingPost = await this.posts.findOne({ _id: post });
     if (!existingPost) {
@@ -71,7 +71,7 @@ export default class PostingConcept {
     }
 
     await this.posts.deleteOne({_id: post})
-    return {};
+    return {success: "successful deletion"};
   }
 
 
@@ -81,13 +81,13 @@ export default class PostingConcept {
    * @requires post exists
    * @effects replaces body of post with newBody
    */
-  async editPost({ post, newBody }: { post: Post; newBody: string }): Promise<Empty|{error: string}> {
+  async editPost({ post, newBody }: { post: Post; newBody: string }): Promise<{success:string}|{error: string}> {
     const existingPost = await this.posts.findOne({ _id: post });
     if (!existingPost) {
       return { error: `Post with ID ${post} not found.` };
     }
     await this.posts.updateOne({_id: post }, { $set: { body: newBody } });
-    return {};
+    return {success:"successful edit"};
   }
 
 

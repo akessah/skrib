@@ -1,4 +1,4 @@
-import { actions, Sync } from "@engine";
+import { actions, Sync, Frames } from "@engine";
 import { Requesting, Sessioning, Authentication } from "@concepts";
 
 //-- User Registration --//
@@ -91,26 +91,25 @@ export const LogoutResponse: Sync = ({ request }) => ({
 });
 
 //change password
-export const changePasswordRequest: Sync = ({ request, session, user, newPassword }) => ({
+export const changePasswordRequest: Sync = ({ request, session, currentPassword, user, newPassword, error }) => ({
   when: actions([
     Requesting.request,
-    { path: "/Authentication/changePassword", session, newPassword },
+    { path: "/Authentication/changePassword", session, newPassword, currentPassword },
     { request },
   ]),
   where: async (frames) => {
-    // Authorize the request: a valid session must exist.
-    // The 'user' is bound but not used in 'then', just for validation.
+
     frames = await frames.query(Sessioning._getUser, { session }, { user });
     console.log(frames);
     return frames
   },
-  then: actions([Authentication.changePassword, { user, newPassword }]),
+  then: actions([Authentication.changePassword, { user, newPassword, currentPassword }]),
 });
 
-export const changePasswordResponseSuccess: Sync = ({ request }) => ({
+export const changePasswordResponseSuccess: Sync = ({ request, success }) => ({
   when: actions(
     [Requesting.request, { path: "/Authentication/changePassword" }, { request }],
-    [Authentication.changePassword, {}, {}],
+    [Authentication.changePassword, {}, {success}],
   ),
   then: actions([Requesting.respond, { request, status: "successfully changed password" }]),
 });
@@ -123,7 +122,7 @@ export const changePasswordResponseFailure: Sync = ({ request, error }) => ({
   then: actions([Requesting.respond, { request, error}]),
 });
 
-//change password
+//delete Account
 export const deleteAccountRequest: Sync = ({ request, session, user, newPassword }) => ({
   when: actions([
     Requesting.request,
@@ -140,10 +139,10 @@ export const deleteAccountRequest: Sync = ({ request, session, user, newPassword
   then: actions([Authentication.deleteUser, { user }]),
 });
 
-export const deleteAccountResponseSuccess: Sync = ({ request }) => ({
+export const deleteAccountResponseSuccess: Sync = ({ success, request }) => ({
   when: actions(
     [Requesting.request, { path: "/Authentication/deleteUser" }, { request }],
-    [Authentication.deleteUser, {}, {}],
+    [Authentication.deleteUser, {}, {success}],
   ),
   then: actions([Requesting.respond, { request, status: "successfully deleted user" }]),
 });

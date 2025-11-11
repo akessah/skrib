@@ -25,10 +25,10 @@ export const UpvoteRequest: Sync = (
 });
 
 export const UpvoteSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Upvoting/upvote", }, { request }, ],
-    [Upvoting.upvote, {}, {}]
+    [Upvoting.upvote, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -67,10 +67,10 @@ export const UnvoteRequest: Sync = (
 });
 
 export const UnvoteSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Upvoting/unvote", }, { request }, ],
-    [Upvoting.unvote, {}, {}]
+    [Upvoting.unvote, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,

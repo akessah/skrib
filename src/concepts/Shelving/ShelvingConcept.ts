@@ -68,13 +68,13 @@ export default class ShelvingConcept {
      * @requires book is on a shelf
      * @effects removes book from shelf
      */
-    async removeBook({ shelf }: { shelf: Shelf}): Promise<Empty|{error: string}> {
+    async removeBook({ shelf }: { shelf: Shelf}): Promise<{success:string}|{error: string}> {
         const existingShelf = await this.shelves.findOne({_id: shelf});
         if(existingShelf == null)
             return {error: `book doesn't exist`};
 
         await this.shelves.deleteOne({_id: shelf});
-        return {};
+        return {success:"successful removal"};
     }
 
 
@@ -83,13 +83,13 @@ export default class ShelvingConcept {
      * @requires book is on a shelf
      * @effects moves book to the shelf specified by the user
      */
-    async changeStatus({ shelf, newStatus }: { shelf: Shelf, newStatus: 0|1|2|3}): Promise<Empty|{error: string}> {
+    async changeStatus({ shelf, newStatus }: { shelf: Shelf, newStatus: 0|1|2|3}): Promise<{success:string}|{error: string}> {
         const existingShelf = await this.shelves.findOne({_id: shelf});
         if(existingShelf == null)
             return {error: `book doesn't exist`};
 
         await this.shelves.updateOne({_id: shelf }, { $set: { status: newStatus } });
-        return {};
+        return {success:"successful status change"};
     }
 
 

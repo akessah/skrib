@@ -178,3 +178,55 @@ export const MarkPublicFailureResponse: Sync = (
     error,
   }]),
 });
+
+//queries
+export const GetTagsByBook: Sync = (
+    {request, session, user, book, _id, label, isPrivate, tag}
+) => ({
+    when: actions([Requesting.request, { path: "/Tagging/_getTagsByBook", session, book}, { request }],),
+    where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Tagging._getTagsByBook, { user, book }, {_id, user, label, book, isPrivate});
+        frames = frames.collectAs([_id, user, label, book, isPrivate], tag);
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        tag
+    }]),
+});
+
+export const GetLabelsByBook: Sync = (
+    {request, session, user, book, count, label, tag}
+) => ({
+    when: actions([Requesting.request, { path: "/Tagging/_getLabelsByBook", session, book}, { request }],),
+    where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Tagging._getLabelsByBook, { user, book }, {label, count});
+        frames = frames.collectAs([label, count], tag);
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        tag
+    }]),
+});
+
+export const GetTagsByUser: Sync = (
+    {request, session, user, book, _id, label, isPrivate, tag}
+) => ({
+    when: actions([Requesting.request, { path: "/Tagging/_getTagsByUser", session}, { request }],),
+    where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        console.log(frames)
+        frames = await frames.query( Tagging._getTagsByUser, { user }, {_id, user, label, book, isPrivate});
+        console.log(frames)
+        frames = frames.collectAs([_id, user, label, book, isPrivate], tag);
+        console.log(frames)
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        tag
+    }]),
+});

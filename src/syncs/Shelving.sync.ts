@@ -1,5 +1,5 @@
 // These two help you declare synchronizations
-import { actions, Sync } from "@engine";
+import { actions, Sync, Frames } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
 import { Requesting, Shelving, Sessioning } from "@concepts";
@@ -131,4 +131,68 @@ export const ChangeStatusFailureResponse: Sync = (
     request,
     error,
   }]),
+});
+
+//queries
+export const GetUserShelfByBook: Sync = (
+    {request, session, user, shelfNumber, results}
+) => ({
+    when: actions([Requesting.request, { path: "/Shelving/_getUserShelfByBook", session, }, { request }],),
+    where: async (frames) => {
+        const originalFrame = frames[0];
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Shelving._getUserShelfByBook, {recipient: user}, {shelfNumber});
+        if (frames.length === 0) {
+          const response = {...originalFrame, [results]: []}
+          return new Frames(response)
+        }
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        shelfNumber
+    }]),
+});
+
+export const GetBooksByUser: Sync = (
+    {request, session, user, status, shelves, results, shelf}
+) => ({
+    when: actions([Requesting.request, { path: '/Shelving/_getBooksByUser', session, }, { request }],),
+    where: async (frames) => {
+        const originalFrame = frames[0];
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Shelving._getBooksByUser, {user}, {status, shelves});
+        if (frames.length === 0) {
+          const response = {...originalFrame, [results]: []}
+          return new Frames(response)
+        }
+        frames = frames.collectAs([status, shelves], shelf)
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        shelf
+    }]),
+});
+
+export const GetShelfByBookAndOwner: Sync = (
+    {request, session, user, book, results, shelf}
+) => ({
+    when: actions([Requesting.request, { path: '/Shelving/_getShelfByBookAndOwner', session, book}, { request }],),
+    where: async (frames) => {
+        const originalFrame = frames[0];
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        console.log(frames)
+        frames = await frames.query( Shelving._getShelfByBookAndOwner, {book, owner: user}, {shelf});
+
+        if (frames.length === 0) {
+          const response = {...originalFrame, [results]: []}
+          return new Frames(response)
+        }
+        return frames;
+    },
+    then: actions([Requesting.respond, {
+        request,
+        shelf
+    }]),
 });

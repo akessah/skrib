@@ -26,7 +26,7 @@ interface Tags {
   user: User;
   label: string;
   book: Book;
-  private: boolean;
+  isPrivate: boolean;
 }
 
 
@@ -59,7 +59,7 @@ export default class TaggingConcept {
             user,
             label,
             book,
-            private: false
+            isPrivate: false
         });
 
         return {tag: tagID};
@@ -90,7 +90,7 @@ export default class TaggingConcept {
         if(existingTag == null)
             return {error: `tag doesn't exist`};
 
-        await this.tags.updateOne({_id: tag }, { $set: { private: true } });
+        await this.tags.updateOne({_id: tag }, { $set: { isPrivate: true } });
         return {};
         // throw new Error("not implemented");
     }
@@ -105,7 +105,7 @@ export default class TaggingConcept {
         if(existingTag == null)
             return {error: `tag doesn't exist`};
 
-        await this.tags.updateOne({_id: tag }, { $set: { private: false } });
+        await this.tags.updateOne({_id: tag }, { $set: { isPrivate: false } });
         return {};
         // throw new Error("not implemented");
     }
@@ -113,11 +113,11 @@ export default class TaggingConcept {
 
     /**
      * returns all public tags associated with book along with
-     * private tags created by user associated with book
+     * isPrivate tags created by user associated with book
      */
     async _getTagsByBook({ user, book }: {user: User; book: Book}): Promise<Tags[]> {
         const tags = this.tags.find({book}).toArray();
-        return (await tags).filter((x) => (!x.private || x.user == user));
+        return (await tags).filter((x) => (!x.isPrivate || x.user == user));
         // throw new Error("not implemented");
     }
 
@@ -148,7 +148,7 @@ export default class TaggingConcept {
      */
     async _getBooksByLabel({ user, labels, type }: {user: User; labels: string[]; type: 'intersect'|'union'}): Promise<{book: Book, tagCount: number}[]> {
         const tags = (await this._getAllTags({}))
-        .filter((x) => (!x.private || x.user == user));
+        .filter((x) => (!x.isPrivate || x.user == user));
 
         const availableBooks = new Set(tags.map((t) => (t.book)));
         const books = []
@@ -208,7 +208,7 @@ export default class TaggingConcept {
      * returns all public tags in database
      */
     async _getAllPublicTags(empty: Empty): Promise<Tags[]> {
-        return await this.tags.find({private: false}).toArray();
+        return await this.tags.find({isPrivate: false}).toArray();
         // throw new Error("not implemented");
     }
 

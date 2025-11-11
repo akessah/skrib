@@ -105,9 +105,9 @@ export default class PostingConcept {
   /**
    * returns all posts created by author
    */
-  async _getPostsByAuthor({ author }: { author: User }): Promise<Posts[]> {
-    return await this.posts.find({ author }).toArray();
-  }
+  // async _getPostsByAuthor({ author }: { author: User }): Promise<Posts[]> {
+  //   return await this.posts.find({ author }).toArray();
+  // }
 
   /**
    * returns all posts in database
@@ -127,9 +127,4 @@ export default class PostingConcept {
     return postInDB !== null? [{author: postInDB.author}]:[]
   }
 
-  async _isSameID({id1, id2}: {id1: ID, id2: ID}): Promise<{isSame: boolean}[]>{
-    await true;
-    console.log(id1 == id2)
-    return [ {isSame: id1 === id2}];
-  }
 }

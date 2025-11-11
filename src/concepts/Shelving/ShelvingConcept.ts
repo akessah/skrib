@@ -98,8 +98,10 @@ export default class ShelvingConcept {
     /**
      * returns status user added to book
      */
-    async _getUserShelfByBook({ user, book }: {user: User; book: Book}): Promise<number[]> {
-        return (await this.shelves.find({user, book}).toArray()).map(shelf => shelf.status);
+    async _getUserShelfByBook({ user, book }: {user: User; book: Book}): Promise<{shelfNumber: number}[]> {
+        const shelf = (await this.shelves.findOne({user, book}));
+        console.log(shelf)
+        return shelf?[{shelfNumber: shelf.status}]:[]
     }
 
     /**

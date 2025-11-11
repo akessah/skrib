@@ -2,17 +2,22 @@
 import { actions, Sync } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
-import { Requesting, Notifying } from "@concepts";
+import { Requesting, Notifying, Sessioning } from "@concepts";
 
 
 export const MarkReadRequest: Sync = (
-  { request, notification },
+  { request, notification, session, user, recipient },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Notifying/read", notification, },
+    { path: "/Notifying/read", notification, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Notifying._getRecipient, {notification}, {recipient});
+        return frames.filter(($) => $[recipient] == $[user]);
+    },
   then: actions([Notifying.read, {
     notification,
   }]),

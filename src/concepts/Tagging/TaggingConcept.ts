@@ -221,6 +221,12 @@ export default class TaggingConcept {
     }
 
 
+    async _getTagOwner({tag}: {tag: Tag}): Promise<{owner: User}[]>{
+        const taginDb = await this.tags.findOne({_id: tag});
+        return taginDb?[{owner: taginDb.user}]:[]
+    }
+
+
 
     private labelSubSet(subSet: string[], superSet: string[]): boolean{
         for (const label of subSet){

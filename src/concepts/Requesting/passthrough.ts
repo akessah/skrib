@@ -30,11 +30,10 @@ export const inclusions: Record<string, string> = {
   "/api/Sessioning/delete": "",
   "/api/Sessioning/_getUser": "",
 
-  "/api/Authentication/register":"",
- "/api/Authentication/deleteUser":"",
- "/api/Authentication/changePassword":"",
- "/api/Authentication/authenticate":"",
- "/api/Authentication/_getAllUsers":"",
+  "/api/Authentication/deleteUser":"",
+  "/api/Authentication/changePassword":"",
+  "/api/Authentication/_getAllUsers":"",
+  "/api/Authentication/_getUsername":"",
 
   "/api/Commenting/_getCommentsByAuthor": "",
   "/api/Commenting/_getCommentsByParent": "",
@@ -50,11 +49,13 @@ export const inclusions: Record<string, string> = {
   "/api/Posting/_getPostsByAuthor":"",
   "/api/Posting/_getAllPosts":"",
   "/api/Posting/_getAuthor":"",
+  "/api/Posting/_isSameID":"",
 
   "/api/Shelving/_getUserShelfByBook":"",
   "/api/Shelving/_getShelvesByBook":"",
   "/api/Shelving/_getBooksByUser":"",
   "/api/Shelving/_getAllShelves":"",
+  "/api/Shelving/_getShelfByBookAndOwner":"",
 
   "/api/Tagging/_getAllPublicTags": "public query",
   "/api/Tagging/_getTagsByBook":"",
@@ -82,6 +83,8 @@ export const inclusions: Record<string, string> = {
 export const exclusions: Array<string> = [
   // Feel free to delete these example exclusions
 
+  "/api/Authentication/register",
+  "/api/Authentication/authenticate",
 
  "/api/Commenting/createComment",
  "/api/Commenting/deleteComment",

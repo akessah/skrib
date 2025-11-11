@@ -2,17 +2,22 @@
 import { actions, Sync } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
-import { Requesting, Upvoting } from "@concepts";
+import { Requesting, Upvoting, Sessioning } from "@concepts";
 
-
+//upvote
 export const UpvoteRequest: Sync = (
-  { request, user, item },
+  { request, user, item, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Upvoting/upvote", user, item },
+    { path: "/Upvoting/upvote", session, item },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        console.log(frames);
+        return frames;
+    },
   then: actions([Upvoting.upvote, {
     user,
     item,
@@ -43,14 +48,18 @@ export const UpvoteFailureResponse: Sync = (
   }]),
 });
 
+//unvote
 export const UnvoteRequest: Sync = (
-  { request, user, item },
+  { request, user, item, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Upvoting/unvote", user, item },
+    { path: "/Upvoting/unvote", session, item },
     { request },
   ]),
+  where: async (frames) => {
+        return await frames.query( Sessioning._getUser, { session }, { user });
+    },
   then: actions([Upvoting.unvote, {
     user,
     item,

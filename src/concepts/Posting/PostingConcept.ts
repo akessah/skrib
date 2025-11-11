@@ -22,6 +22,7 @@ interface Posts {
   _id: Post;
   author: User;
   body: string;
+  date: Date;
 }
 
 
@@ -50,6 +51,7 @@ export default class PostingConcept {
       _id: postId,
       author: user,
       body,
+      date: new Date(),
     });
     return { post: postId };
   }
@@ -111,7 +113,7 @@ export default class PostingConcept {
    * returns all posts in database
    */
   async _getAllPosts({}): Promise<Posts[]> {
-    return await this.posts.find().toArray();
+    return (await this.posts.find().toArray());
   }
 
   /**
@@ -120,8 +122,14 @@ export default class PostingConcept {
   async _getAuthor({post}: {post:Post}): Promise<{author: User}[]>{
     console.log(`looking for post with id ${post}`);
     const postInDB = await this.posts.findOne({_id: post});
-    console.log(`post: ${postInDB}`);
+    console.log(`post: ${postInDB?.author}`);
 
     return postInDB !== null? [{author: postInDB.author}]:[]
+  }
+
+  async _isSameID({id1, id2}: {id1: ID, id2: ID}): Promise<{isSame: boolean}[]>{
+    await true;
+    console.log(id1 == id2)
+    return [ {isSame: id1 === id2}];
   }
 }

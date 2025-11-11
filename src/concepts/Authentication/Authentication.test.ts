@@ -1,7 +1,8 @@
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals, assertStrictEquals } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import AuthenticationConcept from "./AuthenticationConcept.ts";
 import { ID } from "@utils/types.ts";
+import { assert } from "../../engine/test/helpers.ts";
 
 Deno.test("Authentication Concept", async (t) => {
   const [db, client] = await testDb();
@@ -201,6 +202,21 @@ Deno.test("Authentication Concept", async (t) => {
     const users = await concept._getAllUsers({});
     console.log("Users after failed deletion:", users.map((u) => u.username));
     assertEquals(users.length, 1, "The number of users should remain unchanged");
+  });
+
+  await t.step("Testing getUsername", async () => {
+    console.log("\n--- Testing _getUsername ---");
+    const username = "Candy";
+    const password = "CandyPassword";
+
+    const registeredUser = await concept.register({username, password});
+    assert("user" in registeredUser, "should not return error");
+
+    if("user" in registeredUser){
+      const returnedUsername = await concept._getUsername({user: registeredUser.user});
+      assertStrictEquals(returnedUsername.length, 1, "should return one username");
+      assertStrictEquals(returnedUsername[0].username, "Candy", "should return Candy");
+    }
   });
 
   await t.step("Principle Trace: Register and Login Workflow", async () => {

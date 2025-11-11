@@ -1,18 +1,19 @@
 import { actions, Sync } from "@engine";
-import { Posting, Requesting, Commenting } from "@concepts";
+import { Posting, Requesting, Commenting, Sessioning } from "@concepts";
 
 //Creating posts
 export const CreatePostRequest: Sync = (
-  { request, user, body, },
+  { request, user, body, session },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Posting/createPost", user, body },
+    { path: "/Posting/createPost", session, body },
     { request },
   ]),
-  // where: (frames) => {
-  //   return frames.query(Sessioning._getUser, { session }, { user });
-  // },
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        return frames;
+    },
   then: actions([Posting.createPost, {
     user,
     body,
@@ -34,13 +35,18 @@ export const CreatePostResponse: Sync = (
 
 //Deleting Posts
 export const DeletePostRequest: Sync = (
-  { request, post },
+  { request, post, session, user, author },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Posting/deletePost", post },
+    { path: "/Posting/deletePost", post, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Posting._getAuthor, {post}, {author});
+        return frames.filter(($) => $[author] == $[user]);
+    },
   then: actions([Posting.deletePost, {
     post
   }]),
@@ -73,13 +79,18 @@ export const DeletePostFailureResponse: Sync = (
 
 //Editing Posts
 export const EditPostRequest: Sync = (
-  { request, post, newBody },
+  { request, post, newBody, session, user, author, sameAuthor },
 ) => ({
   when: actions([
     Requesting.request,
-    { path: "/Posting/editPost", post, newBody },
+    { path: "/Posting/editPost", post, newBody, session },
     { request },
   ]),
+  where: async (frames) => {
+        frames = await frames.query( Sessioning._getUser, { session }, { user });
+        frames = await frames.query( Posting._getAuthor, {post}, {author});
+        return frames.filter(($) => $[author] == $[user]);
+    },
   then: actions([Posting.editPost, {
     post, newBody
   }]),

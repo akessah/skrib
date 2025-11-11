@@ -30,8 +30,6 @@ export const inclusions: Record<string, string> = {
   "/api/Sessioning/delete": "",
   "/api/Sessioning/_getUser": "",
 
-  "/api/Authentication/deleteUser":"",
-  "/api/Authentication/changePassword":"",
   "/api/Authentication/_getAllUsers":"",
   "/api/Authentication/_getUsername":"",
 
@@ -85,28 +83,30 @@ export const exclusions: Array<string> = [
 
   "/api/Authentication/register",
   "/api/Authentication/authenticate",
+  "/api/Authentication/changePassword",
+  "/api/Authentication/deleteUser",
 
- "/api/Commenting/createComment",
- "/api/Commenting/deleteComment",
- "/api/Commenting/editComment",
+  "/api/Commenting/createComment",
+  "/api/Commenting/deleteComment",
+  "/api/Commenting/editComment",
 
- "/api/Notifying/notify",
- "/api/Notifying/read",
+  "/api/Notifying/notify",
+  "/api/Notifying/read",
 
- "/api/Posting/createPost",
- "/api/Posting/deletePost",
- "/api/Posting/editPost",
+  "/api/Posting/createPost",
+  "/api/Posting/deletePost",
+  "/api/Posting/editPost",
 
- "/api/Shelving/addBook",
- "/api/Shelving/removeBook",
- "/api/Shelving/changeStatus",
+  "/api/Shelving/addBook",
+  "/api/Shelving/removeBook",
+  "/api/Shelving/changeStatus",
 
- "/api/Tagging/addTag",
- "/api/Tagging/removeTag",
- "/api/Tagging/markPrivate",
- "/api/Tagging/markPublic",
+  "/api/Tagging/addTag",
+  "/api/Tagging/removeTag",
+  "/api/Tagging/markPrivate",
+  "/api/Tagging/markPublic",
 
- "/api/Upvoting/upvote",
- "/api/Upvoting/unvote",
+  "/api/Upvoting/upvote",
+  "/api/Upvoting/unvote",
 
 ];

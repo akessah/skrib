@@ -1,198 +1,314 @@
-# error
-when I run deno task concepts to run the server, I get this error
+# server
+[@server](../../src/concept_server.ts)
 
-Task concepts deno run --allow-net --allow-read --allow-sys --allow-env src/concept_server.ts --port 8000 --baseUrl /api
-error: Uncaught (in promise) Error: MongoDB connection failed: MongoServerError: bad auth : authentication failed
-    throw new Error("MongoDB connection failed: " + e);
-          ^
-    at initMongoClient (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:16:11)
-    at eventLoopTick (ext:core/01_core.js:179:7)
-    at async init (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:22:18)
-    at async getDb (file:///C:/Users/Akosua/Documents/6.104/skrib/src/utils/database.ts:50:29)
-    at async main (file:///C:/Users/Akosua/Documents/6.104/skrib/src/concept_server.ts:24:16)
-
-# prompt: why am i getting this error?
+# prompt: how do I get the server to allow requests from localhost:8001?
 
 # response:
 
-The error `MongoServerError: bad auth : authentication failed` is very clear: **Your Deno application is failing to authenticate with your MongoDB database.**
+To allow requests from `localhost:8001` (or any other origin) to your Hono server running on `localhost:8000`, you need to enable Cross-Origin Resource Sharing (CORS).
 
-This means that the username or password (or both) provided in your MongoDB connection string is incorrect or doesn't match an existing user with the necessary permissions on your MongoDB server.
+Hono provides a convenient CORS middleware for this.
 
-Here's a breakdown of why this might be happening and how to fix it:
+Here's how you can modify your `src\concept\_server.ts` file:
 
-### Common Causes
+1.  **Import the `cors` middleware:** Add `import { cors } from "jsr:@hono/cors";`
+2.  **Use the `cors` middleware:** Apply it globally to your `app` instance with `app.use(cors({ /* options */ }))`.
 
-1.  **Incorrect Username:** The username specified in your connection string doesn't exist or is misspelled.
-2.  **Incorrect Password:** The password specified in your connection string is wrong or misspelled.
-3.  **User Not Created:** You might not have created a database user specifically for your application.
-4.  **Insufficient Permissions:** Even if the username/password is correct, the user might not have the necessary roles (e.g., `readWrite` access) on the database your application is trying to connect to.
-5.  **Typo in Connection String:** A simple typo in the URI itself (host, port, database name, etc.) could sometimes lead to auth issues if it's trying to connect to the wrong place or with malformed credentials.
-6.  **Environment Variable Issues:** If your connection string (e.g., `MONGO_URI`) is read from an environment variable (like a `.env` file), the variable might be:
-    *   Missing.
-    *   Malformed.
-    *   Outdated (you changed the password but not the variable).
-    *   Not loaded correctly by Deno.
-7.  **Special Characters in Password:** If your password contains special characters (like `!`, `@`, `#`, `$`, etc.), they might need to be URL-encoded in the connection string.
+## Modified `src\concept\_server.ts`
 
-### How to Debug and Fix It
+```typescript
+import { Hono } from "jsr:@hono/hono";
+import { cors } from "jsr:@hono/cors"; // NEW: Import CORS middleware
+import { getDb } from "@utils/database.ts";
+import { walk } from "jsr:@std/fs";
+import { parseArgs } from "jsr:@std/cli/parse-args";
+import { toFileUrl } from "jsr:@std/path/to-file-url";
 
-1.  **Verify Your MongoDB Credentials:**
-    *   **For MongoDB Atlas (Cloud):**
-        *   Go to your Atlas dashboard.
-        *   Navigate to "Database Access" under "Security."
-        *   Check the list of "Database Users."
-        *   **Ensure the username exists.**
-        *   If you're unsure of the password, click "Edit" on the user and choose "Set Password." **Generate a new secure password and immediately update your application's `MONGO_URI` with this new password.**
-        *   Also, ensure the user has the correct "Database User Privileges" (e.g., `Read and write to any database` or `Read and write to a specific database` where you select your application's database).
-    *   **For Local MongoDB (Self-hosted):**
-        *   Use `mongosh` or MongoDB Compass to connect to your local instance.
-        *   Check the users in your `admin` database or the database you're trying to connect to. You might need to add a user.
-        *   Example command to add a user in `mongosh`:
-            ```javascript
-            use admin; // Or your specific database
-            db.createUser(
-               {
-                 user: "yourAppName",
-                 pwd: "yourStrongPassword",
-                 roles: [ { role: "readWrite", db: "yourDatabaseName" } ]
-               }
-            );
-            ```
+// Parse command-line arguments for port and base URL
+const flags = parseArgs(Deno.args, {
+  string: ["port", "baseUrl"],
+  default: {
+    port: "8000",
+    baseUrl: "/api",
+  },
+});
 
-2.  **Check Your `MONGO_URI` (Connection String):**
-    *   Locate where you define and use your `MONGO_URI` in your Deno application (likely in `src/utils/database.ts`).
-    *   **Example format:** `mongodb+srv://<username>:<password>@<cluster-url>/<database-name>?retryWrites=true&w=majority`
-    *   **Double-check every character** of the username and password against what you verified in step 1.
-    *   **URL Encoding:** If your password has special characters, make sure they are URL-encoded. For example, `#` becomes `%23`. Most drivers handle this automatically if you pass `username` and `password` separately, but if you're constructing the URI manually, be careful.
-    *   **Log the URI (Temporarily):** Add a `console.log()` statement *just before* you attempt to connect to MongoDB in `src/utils/database.ts` (e.g., line 15 or 16). Print the exact connection string your application is using. This will show you exactly what credentials Deno is sending.
-        ```typescript
-        // In src/utils/database.ts around line 15
-        const mongoUri = Deno.env.get("MONGO_URI");
-        if (!mongoUri) {
-          throw new Error("MONGO_URI environment variable is not set.");
-        }
-        console.log("Attempting to connect with URI (password potentially masked for security):", mongoUri.replace(/:([^:]*)@/, ":****@")); // Mask password for log
-        try {
-          const client = new MongoClient();
-          await client.connect(mongoUri); // This is line 16 or near it
-          // ... rest of initMongoClient
-        } catch (e) {
-          throw new Error("MongoDB connection failed: " + e);
-        }
-        ```
+const PORT = parseInt(flags.port, 10);
+const BASE_URL = flags.baseUrl;
+const CONCEPTS_DIR = "src/concepts";
 
-3.  **Verify Environment Variable Loading:**
-    *   If you're using a `.env` file, ensure you have a line like `import 'https://deno.land/std@0.207.0/dotenv/load.ts';` at the very beginning of your main script (`src/concept_server.ts`) or wherever `Deno.env.get` is first called, *before* any database connection attempts.
-    *   Make sure your `.env` file is in the root of your project or in a location Deno can find it.
-    *   Confirm the key in your `.env` file matches what you're trying to retrieve (`MONGO_URI=your_connection_string_here`).
+/**
+ * Main server function to initialize DB, load concepts, and start the server.
+ */
+async function main() {
+  const [db] = await getDb();
+  const app = new Hono();
 
-4.  **Check IP Whitelist (MongoDB Atlas specific):**
-    *   While "bad auth" usually means the connection *reached* the server but failed authentication, it's always good to double-check.
-    *   In MongoDB Atlas, go to "Network Access" under "Security."
-    *   Ensure your current public IP address (or `0.0.0.0/0` for development, though not recommended for production) is whitelisted.
+  // NEW: Enable CORS
+  app.use(
+    cors({
+      origin: "http://localhost:8001", // <--- Specify the allowed origin
+      credentials: true, // Set to true if your client sends cookies or authorization headers
+      allowMethods: ["POST", "GET", "OPTIONS"], // Explicitly allow methods you use
+      allowHeaders: ["Content-Type", "Authorization"], // Explicitly allow headers your client might send
+    }),
+  );
 
-By systematically going through these steps, you should be able to identify and correct the cause of your MongoDB authentication failure. The most common culprit is simply a typo in the username or password.
+  app.get("/", (c) => c.text("Concept Server is running."));
 
-# error
-I now get this error
+  // --- Dynamic Concept Loading and Routing ---
+  console.log(`Scanning for concepts in ./${CONCEPTS_DIR}...`);
 
-Task concepts deno run --allow-net --allow-read --allow-sys --allow-env src/concept_server.ts --port 8000 --baseUrl /api
-Scanning for concepts in ./src/concepts...
-! Error loading concept from src\concepts/conceptsConcept.ts: NotFound: The system cannot find the file specified. (os error 2): realpath 'src\concepts/conceptsConcept.ts'
-    at Object.realPathSync (ext:deno_fs/30_fs.js:237:10)
-    at main (file:///C:/Users/Akosua/Documents/6.104/skrib/src/concept_server.ts:45:41)
-    at eventLoopTick (ext:core/01_core.js:179:7) {
-  name: "NotFound",
-  code: "ENOENT"
-}
-! Error loading concept from src\concepts\skrib/skribConcept.ts: NotFound: The system cannot find the file specified. (os error 2): realpath 'src\concepts\skrib/skribConcept.ts'
-    at Object.realPathSync (ext:deno_fs/30_fs.js:237:10)
-    at main (file:///C:/Users/Akosua/Documents/6.104/skrib/src/concept_server.ts:45:41)
-    at eventLoopTick (ext:core/01_core.js:179:7) {
-  name: "NotFound",
-  code: "ENOENT"
-}
+  for await (
+    const entry of walk(CONCEPTS_DIR, {
+      maxDepth: 1,
+      includeDirs: true,
+      includeFiles: false,
+    })
+  ) {
+    entry.path = entry.path.replace('\\', '/');
+    console.log(`entry.path: ${entry.path}, CONCEPTS_DIR: ${CONCEPTS_DIR}`)
+    if (entry.path === CONCEPTS_DIR) continue; // Skip the root directory
 
-Server listening on http://localhost:8000
-Listening on http://localhost:8000/ (http://localhost:8000/)
+    const conceptName = entry.name;
+    const conceptFilePath = `${entry.path}/${conceptName}Concept.ts`;
 
-# prompt: why am I getting this error?
-
-# response:
-
-The error `NotFound: The system cannot find the file specified. (os error 2)` combined with the paths like `src\concepts/conceptsConcept.ts` and `src\concepts\skrib/skribConcept.ts` is a classic indication of a **file path construction issue, very likely related to mixed path separators and platform differences.**
-
-Let's break down why you're getting this:
-
-### The Core Problem: Mixed Path Separators
-
-You can see that the paths in the error message are a mix of Windows-style backslashes (`\`) and Unix-style forward slashes (`/`):
-*   `src\concepts/conceptsConcept.ts`
-*   `src\concepts\skrib/skribConcept.ts`
-
-While Deno and many operating systems are generally tolerant of forward slashes on Windows, when you explicitly mix them like this, or if a backslash is introduced where a forward slash is expected (or vice-versa), the underlying file system operations (like `realpath` which tries to find the canonical path) can fail because they don't recognize the resulting path as valid.
-
-### Detailed Causes:
-
-1.  **Inconsistent Path Construction:** Somewhere in your `src/concept_server.ts` (specifically around line 45 in the `main` function), or in a utility function it calls, you are likely constructing these file paths by manually concatenating strings using hardcoded slashes, or by combining path segments from different sources that use different conventions.
-2.  **Platform Differences:**
-    *   **Windows** typically uses `\` as a path separator.
-    *   **Unix-like systems** (Linux, macOS) use `/` as a path separator.
-    Deno (and Node.js) applications are designed to be cross-platform, and the best practice is to use a dedicated `path` module to handle these differences automatically.
-3.  **File Literally Not Found:** While less likely to produce *this specific* mixed-separator path, it's possible that even with correct path separators, the files `conceptsConcept.ts` and `skribConcept.ts` do not exist at the exact locations your script expects them to be relative to where the script is run. This could be due to:
-    *   Typo in the filename.
-    *   File moved or deleted.
-    *   Case sensitivity issues (if your file system is case-sensitive, `conceptsconcept.ts` is different from `conceptsConcept.ts`).
-
-### How to Debug and Fix It:
-
-1.  **Standardize Path Construction with Deno's `path` module:**
-    This is the most crucial fix. Deno's standard library provides a `path` module that intelligently handles platform-specific path separators.
-
-    *   **Import the `path` module:**
-        ```typescript
-        import * as path from "https://deno.land/std@0.217.0/path/mod.ts"; // Use your Deno std version
-        ```
-    *   **Use `path.join()` for combining path segments:**
-        Instead of manually doing `"./src/concepts/" + conceptFile` or similar, use `path.join()`.
-        For example, if you're trying to get `src/concepts/conceptsConcept.ts`:
-        ```typescript
-        // Bad (manual concatenation, can lead to mixed separators or double slashes)
-        // const filePath = "./src/concepts/" + filename;
-
-        // Good (using path.join for robustness)
-        const baseDir = "./src/concepts"; // Or Deno.cwd(), etc.
-        const filePath = path.join(baseDir, filename);
-
-        // Even better if scanning a directory and getting filenames:
-        // Assume `dirEntry.name` is "conceptsConcept.ts" and `basePath` is "src/concepts"
-        const fullPath = path.join(basePath, dirEntry.name);
-        ```
-
-    *   **Look at `src/concept_server.ts` around line 45:**
-        This is where the error indicates the path is being constructed or used. You'll likely find a loop or logic that iterates through directory entries and constructs the full path for each concept file. Ensure `path.join()` is used there.
-
-2.  **Verify File Existence and Naming:**
-    *   **Manually check:** Open your file explorer and navigate to `C:/Users/Akosua/Documents/6.104/skrib/src/concepts/`.
-    *   **Confirm:** Do you actually have files named `conceptsConcept.ts` and `skribConcept.ts` directly within `src/concepts/`?
-    *   **Subdirectories:** The error `src\concepts\skrib/skribConcept.ts` suggests that `skribConcept.ts` might be in a *subdirectory* called `skrib` within `src/concepts`. If so, your scanning logic needs to account for subdirectories (e.g., by using `Deno.readDir` with `recursive: true` or manually traversing subdirectories). If it *should* be directly in `src/concepts`, then its current location is wrong.
-
-3.  **Add Debugging Logs:**
-    Temporarily add `console.log()` statements in your `src/concept_server.ts` just before the line where the error occurs (line 45 in `main`). Print out the exact path string that your application is trying to access.
-
-    ```typescript
-    // In src/concept_server.ts around line 45
-    // Assume you have a 'conceptFilePath' variable that's causing the issue
-    console.log("Attempting to load concept from path:", conceptFilePath);
     try {
-        // ... your code that uses Deno.realPathSync or Deno.readFile
-        // ... (e.g., Deno.readTextFile(conceptFilePath))
-    } catch (e) {
-        console.error("Error loading concept:", conceptFilePath, e);
-        throw e; // Re-throw to keep the original stack trace
-    }
-    ```
-    This will show you the exact malformed path string *before* the Deno runtime tries to resolve it, helping you pinpoint where it's being constructed incorrectly.
+      const modulePath = toFileUrl(Deno.realPathSync(conceptFilePath)).href;
+      const module = await import(modulePath);
+      const ConceptClass = module.default;
 
-By systematically addressing how your paths are built using the `path` module and verifying the actual file locations, you should resolve this "NotFound" error.
+      if (
+        typeof ConceptClass !== "function" ||
+        !ConceptClass.name.endsWith("Concept")
+      ) {
+        console.warn(
+          `! No valid concept class found in ${conceptFilePath}. Skipping.`,
+        );
+        continue;
+      }
+
+      const instance = new ConceptClass(db);
+      const conceptApiName = conceptName;
+      console.log(
+        `- Registering concept: ${conceptName} at ${BASE_URL}/${conceptApiName}`,
+      );
+
+      const methodNames = Object.getOwnPropertyNames(
+        Object.getPrototypeOf(instance),
+      )
+        .filter((name) =>
+          name !== "constructor" && typeof instance[name] === "function"
+        );
+
+      for (const methodName of methodNames) {
+        const actionName = methodName;
+        const route = `${BASE_URL}/${conceptApiName}/${actionName}`;
+        // console.log(route)
+
+        app.post(route, async (c) => {
+          try {
+            const body = await c.req.json().catch(() => ({})); // Handle empty body
+            const result = await instance[methodName](body);
+            return c.json(result);
+          } catch (e) {
+            console.error(`Error in ${conceptName}.${methodName}:`, e);
+            return c.json({ error: "An internal server error occurred." }, 500);
+          }
+        });
+        console.log(`  - Endpoint: POST ${route}`);
+      }
+    } catch (e) {
+      console.error(
+        `! Error loading concept from ${conceptFilePath}:`,
+        e,
+      );
+    }
+  }
+
+  console.log(`\nServer listening on http://localhost:${PORT}`);
+  Deno.serve({ port: PORT }, app.fetch);
+}
+
+// Run the server
+main();
+```
+
+### Explanation of CORS Options:
+
+*   **`origin: "http://localhost:8001"`**: This is the most important part. It tells browsers that requests coming from `http://localhost:8001` are allowed to access this server.
+    *   If you need to allow multiple specific origins, you can provide an array: `origin: ["http://localhost:8001", "http://another-client.com"]`.
+    *   If you want to allow *any* origin (be cautious with this in production, as it can be a security risk), you can use `origin: "*"`.
+*   **`credentials: true`**: Set this to `true` if your client-side application sends credentials like cookies, HTTP authentication, or TLS client certificates with its requests. If you don't use these, you can omit it or set it to `false`.
+*   **`allowMethods: ["POST", "GET", "OPTIONS"]`**: This specifies which HTTP methods are allowed for cross-origin requests. Since your server primarily uses `POST` routes and has a `GET` root, `POST` and `GET` are essential. `OPTIONS` is needed for "preflight requests" that browsers automatically send before certain complex HTTP requests (like `POST` with a `Content-Type` other than `application/x-www-form-urlencoded`, `multipart/form-data`, or `text/plain`).
+*   **`allowHeaders: ["Content-Type", "Authorization"]`**: This specifies which headers are allowed in cross-origin requests. `Content-Type` is very common, especially for JSON bodies. If your client sends an `Authorization` header (e.g., for JWTs or API keys), you must include it here.
+
+### Running Your Server
+
+You'll need to grant the necessary Deno permissions:
+
+```bash
+deno run -A src/concept/_server.ts
+```
+
+Or, with more specific permissions:
+
+```bash
+deno run --allow-net --allow-read --allow-env src/concept/_server.ts
+```
+
+Now, any client-side application (e.g., a React app, a simple HTML file with Fetch API) running on `http://localhost:8001` will be able to make `POST` requests to your Hono server on `http://localhost:8000` without triggering CORS errors in the browser.
+
+# error
+error: JSR package not found: @hono/cors
+    at file:///C:/Users/Akosua/Documents/6.104/skrib/src/concept_server.ts:2:22
+
+# prompt: how do I fix this?
+
+# response:
+
+You're encountering the error `JSR package not found: @hono/cors`. This means Deno couldn't locate or download the `cors` middleware from the JSR registry.
+
+Here's how to troubleshoot and fix this:
+
+1.  **Update Deno:**
+    JSR (Deno's official package registry) is relatively new, and Deno's support for it has improved with recent versions. Ensure your Deno CLI is up-to-date.
+    Open your terminal and run:
+    ```bash
+    deno upgrade
+    ```
+    After upgrading, try running your server again.
+
+2.  **Clear Deno's Module Cache:**
+    Sometimes Deno's cache can get corrupted or an incomplete download might be cached. Clearing it will force Deno to re-download all modules, including `@hono/cors`.
+    Run this command in your terminal:
+    ```bash
+    deno cache --reload src/concept/_server.ts
+    ```
+    This command specifically reloads dependencies for your server file. If you want to clear the entire global cache (more drastic but sometimes necessary), you can use:
+    ```bash
+    deno cache --reset
+    ```
+    After clearing the cache, try running your server.
+
+3.  **Check Network Connectivity:**
+    Ensure your machine has a stable internet connection and can reach `jsr.io` (where JSR packages are hosted). Sometimes corporate proxies or firewalls can interfere with Deno's ability to fetch remote modules.
+
+4.  **Verify the Import Path (already looks correct):**
+    The import `import { cors } from "jsr:@hono/cors";` is the correct way to import the Hono CORS middleware from JSR. There's no typo there.
+
+### Summary of Steps to Try:
+
+1.  **`deno upgrade`**
+2.  **`deno cache --reload src/concept/_server.ts`** (or `deno cache --reset`)
+3.  Then, run your server again:
+    ```bash
+    deno run -A src/concept/_server.ts
+    ```
+    (Or with more granular permissions if you prefer: `deno run --allow-net --allow-read --allow-env src/concept/_server.ts`)
+
+These steps should resolve the "JSR package not found" error by ensuring Deno is up-to-date and has a clean, fresh download of the required package.
+
+# prompt: I'm still getting the error
+
+# response:
+
+Okay, if you're still getting `JSR package not found: @hono/cors` after upgrading Deno and reloading the cache, it points to a more fundamental issue with Deno's ability to resolve or download JSR packages from the internet.
+
+Let's try some deeper troubleshooting steps:
+
+### 1. **Verify Your Deno Version (Again)**
+
+Just to be absolutely sure, run:
+
+```bash
+deno -v
+```
+
+You should be on a relatively recent version (e.g., `1.37.x` or higher, ideally the latest stable). If it's an older version, the `deno upgrade` might not have worked as expected.
+
+### 2. **Test JSR Connectivity with a Simple Package**
+
+Let's see if Deno can fetch *any* JSR package, or if the problem is specific to `@hono/cors`.
+
+Create a new, temporary Deno file (e.g., `test_jsr.ts`):
+
+```typescript
+// test_jsr.ts
+import { blue } from "jsr:@std/fmt/colors"; // A very common JSR package
+
+console.log(blue("If you see this in blue, JSR is working!"));
+```
+
+Then run it:
+
+```bash
+deno run test_jsr.ts
+```
+
+*   **If it runs and prints in blue:** This means Deno can generally access JSR. The problem might be specific to `@hono/cors` or some cached state. Try `deno cache --reset` (which is more aggressive than `--reload`) and then re-run your server.
+*   **If it *fails* with a "JSR package not found" error:** This confirms Deno has a general problem fetching *any* JSR package. This is a stronger indicator of network, proxy, or Deno installation issues.
+
+### 3. **Deep Dive into Network/Proxy Issues**
+
+Since you're on Windows and seeing "JSR package not found", the most common culprits are:
+
+*   **Corporate Proxy / VPN:** Are you on a network that uses a proxy server or a VPN? If so, Deno needs to be configured to use it.
+    *   Set environment variables:
+        ```cmd
+        set HTTP_PROXY=http://your.proxy.server:port
+        set HTTPS_PROXY=http://your.proxy.server:port
+        ```
+        (Replace with your actual proxy details). You might need to set these permanently or in your terminal session *before* running Deno.
+    *   **TLS/SSL Inspection:** Some corporate proxies intercept HTTPS traffic and re-sign certificates. Deno might not trust these certificates.
+        *   You might need to download your company's root CA certificate and tell Deno to use it:
+            ```cmd
+            set DENO_TLS_CA_STORE=C:\path\to\your\company_root_ca.pem
+            ```
+            This is an advanced step, and you'd need to get the CA file from your IT department.
+
+*   **Firewall:** Ensure your firewall (Windows Defender Firewall or a third-party one) isn't blocking Deno from making outbound connections to `jsr.io` (or any external servers).
+
+### 4. **Check Deno's Debug Output**
+
+Run your server with a debug log level to see more verbose output about what Deno is doing when it tries to resolve dependencies:
+
+```bash
+DENO_VERBOSE=1 deno run -A src/concept/_server.ts
+# Or on Windows, try:
+# $env:DENO_VERBOSE=1; deno run -A src/concept/_server.ts
+```
+Look for messages around `jsr:@hono/cors` that might indicate network errors, timeouts, or certificate issues.
+
+### 5. **Reinstall Deno Completely**
+
+If none of the above work, your Deno installation itself might be corrupted.
+
+1.  **Uninstall Deno:**
+    *   If you installed with `scoop`: `scoop uninstall deno`
+    *   If you installed manually: Delete the Deno executable (`deno.exe`) and the `DENO_INSTALL` directory (if you set one). Also remove any Deno-related paths from your system's `PATH` environment variable.
+2.  **Delete Deno's global cache:**
+    *   The cache location is usually `C:\Users\<YourUser>\AppData\Local\deno` on Windows. Delete this entire folder.
+3.  **Reinstall Deno:**
+    *   The recommended way on Windows is using `scoop`:
+        ```cmd
+        scoop install deno
+        ```
+    *   Alternatively, use the installer script (PowerShell):
+        ```powershell
+        irm https://deno.land/install.ps1 | iex
+        ```
+    *   Make sure Deno is added to your `PATH` correctly. Restart your terminal after reinstallation.
+
+After reinstalling, try running your server again with a clean slate.
+
+### What to provide if it's still failing:
+
+If the issue persists, please provide:
+
+1.  The exact output of `deno -v`.
+2.  The output of running `deno run test_jsr.ts` (from step 2).
+3.  The full error log when running your main server script with `DENO_VERBOSE=1` (from step 4).
+4.  Information about your network environment (e.g., corporate network, VPN, home network).
+
+This will help pinpoint whether it's a Deno version issue, a general JSR connectivity problem, or something specific to your network setup.

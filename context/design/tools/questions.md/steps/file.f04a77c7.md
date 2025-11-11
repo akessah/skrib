@@ -1,5 +1,13 @@
+---
+timestamp: 'Tue Oct 21 2025 18:08:20 GMT-0400 (Eastern Daylight Time)'
+parent: '[[..\20251021_180820.11f00c08.md]]'
+content_id: f04a77c7a0124e679aef806c84ee32e40e37757ad2bc9bfdca04c5815af8e991
+---
+
+# file: src\concept\_server.ts
+
+```typescript
 import { Hono } from "jsr:@hono/hono";
-import { cors } from "@hono/hono/cors";
 import { getDb } from "@utils/database.ts";
 import { walk } from "jsr:@std/fs";
 import { parseArgs } from "jsr:@std/cli/parse-args";
@@ -25,15 +33,6 @@ const CONCEPTS_DIR = "src/concepts";
 async function main() {
   const [db] = await getDb();
   const app = new Hono();
-
-  app.use(
-    cors({
-      origin: "http://localhost:8001", // <--- Specify the allowed origin
-      credentials: true, // Set to true if your client sends cookies or authorization headers
-      allowMethods: ["POST", "GET", "OPTIONS"], // Explicitly allow methods you use
-      allowHeaders: ["Content-Type", "Authorization"], // Explicitly allow headers your client might send
-    }),
-  );
 
   app.get("/", (c) => c.text("Concept Server is running."));
 
@@ -116,3 +115,5 @@ async function main() {
 
 // Run the server
 main();
+
+```

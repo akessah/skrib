@@ -70,14 +70,14 @@ export default class TaggingConcept {
      * @requires tag exists
      * @effects removes tag from Tags set
      */
-    async removeTag({ tag }: { tag: Tag}): Promise<Empty|{error: string}> {
+    async removeTag({ tag }: { tag: Tag}): Promise<{success:string}|{error: string}> {
         const existingTag = await this.tags.findOne({_id: tag});
         if(existingTag == null)
             return {error: `tag doesn't exist`};
 
         await this.tags.deleteOne({_id: tag});
         console.log(`tag: ${tag}`);
-        return {};
+        return {success: "successful removal"};
     }
 
     /**
@@ -85,13 +85,13 @@ export default class TaggingConcept {
      * @requires tag exists
      * @effects sets private flag to true
      */
-    async markPrivate({ tag }: { tag: Tag}): Promise<Empty|{error: string}> {
+    async markPrivate({ tag }: { tag: Tag}): Promise<{success:string}|{error: string}> {
         const existingTag = await this.tags.findOne({_id: tag});
         if(existingTag == null)
             return {error: `tag doesn't exist`};
 
         await this.tags.updateOne({_id: tag }, { $set: { isPrivate: true } });
-        return {};
+        return {success: "successfully marked private"};
         // throw new Error("not implemented");
     }
 
@@ -100,13 +100,13 @@ export default class TaggingConcept {
      * @requires tag exists
      * @effects sets private flag to false
      */
-    async markPublic({ tag }: { tag: Tag}): Promise<Empty|{error: string}> {
+    async markPublic({ tag }: { tag: Tag}): Promise<{success:string}|{error: string}> {
         const existingTag = await this.tags.findOne({_id: tag});
         if(existingTag == null)
             return {error: `tag doesn't exist`};
 
         await this.tags.updateOne({_id: tag }, { $set: { isPrivate: false } });
-        return {};
+        return {success: "successfully marked public"};
         // throw new Error("not implemented");
     }
 

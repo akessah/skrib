@@ -1,5 +1,5 @@
 // These two help you declare synchronizations
-import { actions, Sync } from "@engine";
+import { actions, Sync, Frames } from "@engine";
 // Choose whatever concepts you have. Assuming PostingConcept and CommentingConcept
 // are available and have the necessary actions/queries based on the spec and examples.
 import { Requesting, Tagging, Sessioning } from "@concepts";
@@ -79,7 +79,7 @@ export const RemoveTagSuccessResponse: Sync = (
   }]),
 });
 
-export const RemoveTagFailureResponse: Sync = (
+export const RemoveTagureResponse: Sync = (
   { request, error },
 ) => ({
   when: actions([Requesting.request, { path: "/Tagging/removeTag", }, { request }, ],
@@ -112,10 +112,10 @@ export const MarkPrivateRequest: Sync = (
 });
 
 export const MarkPrivateSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Tagging/markPrivate", }, { request }, ],
-    [Tagging.markPrivate, {}, {}]
+    [Tagging.markPrivate, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -156,10 +156,10 @@ export const MarkPublicRequest: Sync = (
 });
 
 export const MarkPublicSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Tagging/markPublic", }, { request }, ],
-    [Tagging.markPublic, {}, {}]
+    [Tagging.markPublic, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -181,12 +181,17 @@ export const MarkPublicFailureResponse: Sync = (
 
 //queries
 export const GetTagsByBook: Sync = (
-    {request, session, user, book, _id, label, isPrivate, tag}
+    {request, session, user, book, _id, label, isPrivate, tag, results}
 ) => ({
     when: actions([Requesting.request, { path: "/Tagging/_getTagsByBook", session, book}, { request }],),
     where: async (frames) => {
+        const originalFrame = frames[0];
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         frames = await frames.query( Tagging._getTagsByBook, { user, book }, {_id, user, label, book, isPrivate});
+        if (frames.length === 0) {
+          const response = {...originalFrame, [tag]: []}
+          return new Frames(response)
+        }
         frames = frames.collectAs([_id, user, label, book, isPrivate], tag);
         return frames;
     },
@@ -197,12 +202,17 @@ export const GetTagsByBook: Sync = (
 });
 
 export const GetLabelsByBook: Sync = (
-    {request, session, user, book, count, label, tag}
+    {request, session, user, book, count, label, tag, results}
 ) => ({
     when: actions([Requesting.request, { path: "/Tagging/_getLabelsByBook", session, book}, { request }],),
     where: async (frames) => {
+      const originalFrame = frames[0];
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         frames = await frames.query( Tagging._getLabelsByBook, { user, book }, {label, count});
+        if (frames.length === 0) {
+          const response = {...originalFrame, [tag]: []}
+          return new Frames(response)
+        }
         frames = frames.collectAs([label, count], tag);
         return frames;
     },
@@ -213,14 +223,19 @@ export const GetLabelsByBook: Sync = (
 });
 
 export const GetTagsByUser: Sync = (
-    {request, session, user, book, _id, label, isPrivate, tag}
+    {request, session, user, book, _id, label, isPrivate, tag, results}
 ) => ({
     when: actions([Requesting.request, { path: "/Tagging/_getTagsByUser", session}, { request }],),
     where: async (frames) => {
+        const originalFrame = frames[0]
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         console.log(frames)
         frames = await frames.query( Tagging._getTagsByUser, { user }, {_id, user, label, book, isPrivate});
         console.log(frames)
+        if (frames.length === 0) {
+          const response = {...originalFrame, [tag]: []}
+          return new Frames(response)
+        }
         frames = frames.collectAs([_id, user, label, book, isPrivate], tag);
         console.log(frames)
         return frames;

@@ -66,14 +66,14 @@ export default class CommentingConcept {
    * @requires comment exists
    * @effects removes comment from Comments set
    */
-  async deleteComment({ comment }: { comment: Comment;}): Promise<Empty|{error: string}> {
+  async deleteComment({ comment }: { comment: Comment;}): Promise<{success:string}|{error: string}> {
     const existingComment = await this.comments.findOne({ _id: comment });
     if (!existingComment) {
       return { error: `Comment with ID ${comment} not found.` };
     }
 
     this.comments.deleteOne({_id: comment})
-    return {};
+    return {success:"successful deletion"};
   }
 
 
@@ -83,13 +83,13 @@ export default class CommentingConcept {
    * @requires comment exists
    * @effects replaces body of comment with newBody
    */
-  async editComment({ comment, newBody }: { comment: Comment; newBody: string }): Promise<Empty|{error: string}> {
+  async editComment({ comment, newBody }: { comment: Comment; newBody: string }): Promise<{success:string}|{error: string}> {
     const existingComment = await this.comments.findOne({ _id: comment });
     if (!existingComment) {
       return { error: `Comment with ID ${comment} not found.` };
     }
     await this.comments.updateOne({_id: comment }, { $set: { body: newBody } });
-    return {};
+    return {success: "successful edit"};
   }
 
 

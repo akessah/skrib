@@ -67,10 +67,10 @@ export const RemoveBookRequest: Sync = (
 });
 
 export const RemoveBookSuccessResponse: Sync = (
-  { request, },
+  { request, success},
 ) => ({
   when: actions([Requesting.request, { path: "/Shelving/removeBook", }, { request }, ],
-    [Shelving.removeBook, {}, {}]
+    [Shelving.removeBook, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -110,10 +110,10 @@ export const ChangeStatusRequest: Sync = (
 });
 
 export const ChangeStatusSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Shelving/changeStatus", }, { request }, ],
-    [Shelving.changeStatus, {}, {}]
+    [Shelving.changeStatus, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -143,7 +143,7 @@ export const GetUserShelfByBook: Sync = (
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         frames = await frames.query( Shelving._getUserShelfByBook, {recipient: user}, {shelfNumber});
         if (frames.length === 0) {
-          const response = {...originalFrame, [results]: []}
+          const response = {...originalFrame, [shelfNumber]: []}
           return new Frames(response)
         }
         return frames;
@@ -163,7 +163,7 @@ export const GetBooksByUser: Sync = (
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         frames = await frames.query( Shelving._getBooksByUser, {user}, {status, shelves});
         if (frames.length === 0) {
-          const response = {...originalFrame, [results]: []}
+          const response = {...originalFrame, [shelf]: []}
           return new Frames(response)
         }
         frames = frames.collectAs([status, shelves], shelf)
@@ -186,7 +186,7 @@ export const GetShelfByBookAndOwner: Sync = (
         frames = await frames.query( Shelving._getShelfByBookAndOwner, {book, owner: user}, {shelf});
 
         if (frames.length === 0) {
-          const response = {...originalFrame, [results]: []}
+          const response = {...originalFrame, [shelf]: []}
           return new Frames(response)
         }
         return frames;

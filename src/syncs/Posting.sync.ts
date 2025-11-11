@@ -53,10 +53,10 @@ export const DeletePostRequest: Sync = (
 });
 
 export const DeletePostSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Posting/deletePost"}, { request },],
-    [Posting.deletePost, {}, {}]
+    [Posting.deletePost, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,
@@ -97,10 +97,10 @@ export const EditPostRequest: Sync = (
 });
 
 export const EditPostSuccessResponse: Sync = (
-  { request },
+  { request, success },
 ) => ({
   when: actions([Requesting.request, { path: "/Posting/editPost"}, { request },],
-    [Posting.editPost, {}, {}]
+    [Posting.editPost, {}, {success}]
   ),
   then: actions([Requesting.respond, {
     request,

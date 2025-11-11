@@ -8,6 +8,7 @@ const PREFIX = "Notifying" + ".";
 
 // Generic types of this concept
 type User = ID;
+type Post = ID;
 
 
 //internal ids
@@ -23,6 +24,7 @@ interface Notifications {
   recipient: User;
   message: string;
   read: boolean;
+  post: Post|null
 }
 
 
@@ -43,14 +45,15 @@ export default class NotifyingConcept {
    * Creates a notification
    * @effects creates a notification with message for user and adds it to notifications set
    */
-  async notify({ user, message }: { user: User; message: string }): Promise<{notification: Notification}> {
+  async notify({ user, message, post }: { user: User; message: string, post:Post|null }): Promise<{notification: Notification}> {
 
     const notificationId = freshID() as Notification;
     await this.notifications.insertOne({
       _id: notificationId,
       recipient: user,
       message,
-      read: false
+      read: false,
+      post
     });
     return { notification: notificationId };
   }

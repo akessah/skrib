@@ -44,7 +44,7 @@ export default class UpvotingConcept {
    * requires: no vote by user for item
    * effects: adds vote by user for item to Votes set
    */
-  async upvote({ user, item }: { user: User; item: Item }): Promise<Empty|{error: string}> {
+  async upvote({ user, item }: { user: User; item: Item }): Promise<{success:string}|{error: string}> {
     const existingVote = await this.votes.findOne({ user: user, target: item });
     if (existingVote) {
       return { error: `User ${user} has already upvoted ${item}` };
@@ -56,7 +56,7 @@ export default class UpvotingConcept {
       user,
       target: item,
     });
-    return { };
+    return { success: "successful upvote"};
   }
 
 
@@ -65,14 +65,14 @@ export default class UpvotingConcept {
     * requires: no vote by user for item
     * effects: adds vote by user for item to Votes set
    */
-  async unvote({ user, item }: { user: User; item: Item }): Promise<Empty|{error: string}> {
+  async unvote({ user, item }: { user: User; item: Item }): Promise<{success:string}|{error: string}> {
     const existingVote = await this.votes.findOne({ user: user, target: item });
     if (!existingVote) {
       return { error: `User ${user} hasn't upvoted ${item}` };
     }
 
     await this.votes.deleteOne({ user: user, target: item });
-    return {}
+    return {success: "successful unvote"}
   }
 
 

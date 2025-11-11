@@ -57,7 +57,7 @@ export default class AuthenticationConcept {
    * @requires user to exist
    * @effects removes user from user set
    */
-async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
+async deleteUser({ user }: { user: User }): Promise<{success:string}| {error: string}> {
 
     const existingUser = await this.users.findOne({_id: user});
     if (!existingUser)
@@ -65,7 +65,7 @@ async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
 
 
     await this.users.deleteOne({_id: user});
-    return {};
+    return {success: "successful deletion"};
   }
 
 
@@ -75,13 +75,16 @@ async deleteUser({ user }: { user: User }): Promise<Empty| {error: string}> {
    * @requires user to exisr
    * @effects changes the password associated to user to newPassword
    */
-  async changePassword({ user, newPassword }: { user: User; newPassword: string }): Promise<Empty|{error: string}> {
+  async changePassword({ currentPassword, user, newPassword }: { currentPassword: string, user: User; newPassword: string }): Promise<{success:string}|{error: string}> {
     const existingUser = await this.users.findOne({ _id: user });
     if (!existingUser) {
       return { error: `User not found` };
     }
+    if (existingUser.password !== currentPassword){
+      return {error: `Incorrect current password`};
+    }
     await this.users.updateOne({_id: user }, { $set: { password: newPassword } });
-    return {};
+    return {success: "successful deletion"};
   }
 
 

@@ -25,47 +25,39 @@
  */
 
 export const inclusions: Record<string, string> = {
-  // Feel free to delete these example inclusions
   "/api/Sessioning/create": "",
   "/api/Sessioning/delete": "",
   "/api/Sessioning/_getUser": "",
 
   "/api/Authentication/_getAllUsers":"",
-  "/api/Authentication/_getUsername":"",
+  "/api/Authentication/_getUsername":"Should be able to get usernames even if not logged in",
 
-  "/api/Commenting/_getCommentsByAuthor": "",
-  "/api/Commenting/_getCommentsByParent": "",
-  "/api/Commenting/_getAllComments": "",
-  "/api/Commenting/_getParent": "",
-  "/api/Commenting/_getAuthor": "",
+  "/api/Commenting/_getCommentsByAuthor": "public",
+  "/api/Commenting/_getCommentsByParent": "public",
+  "/api/Commenting/_getAllComments": "public",
+  "/api/Commenting/_getParent": "public",
+  "/api/Commenting/_getAuthor": "public",
 
-  "/api/Notifying/_getNotificationsByUser": "",
-  "/api/Notifying/_getReadNotificationsByUser": "",
-  "/api/Notifying/_getUnreadNotificationsByUser": "",
-  "/api/Notifying/_getAllNotifications": "",
+  // "/api/Notifying/_getAllNotifications": "",
+  "/api/Notifying/_getRecipient":"never used by frontend",
 
-  "/api/Posting/_getPostsByAuthor":"",
-  "/api/Posting/_getAllPosts":"",
-  "/api/Posting/_getAuthor":"",
-  "/api/Posting/_isSameID":"",
+  // "/api/Posting/_getPostsByAuthor":"",
+  "/api/Posting/_getAllPosts":"public",
+  "/api/Posting/_getAuthor":"never actually used by frontend",
 
-  "/api/Shelving/_getUserShelfByBook":"",
   "/api/Shelving/_getShelvesByBook":"",
-  "/api/Shelving/_getBooksByUser":"",
   "/api/Shelving/_getAllShelves":"",
-  "/api/Shelving/_getShelfByBookAndOwner":"",
+  "/api/Shelving/_getShelfOwner":"never used by frontend",
 
   "/api/Tagging/_getAllPublicTags": "public query",
-  "/api/Tagging/_getTagsByBook":"",
-  "/api/Tagging/_getLabelsByBook":"",
-  "/api/Tagging/_getBooksByLabel":"",
-  "/api/Tagging/_getTagsByUser":"",
-  "/api/Tagging/_getLabelsByUser":"",
-  "/api/Tagging/_getAllTags":"",
+  "/api/Tagging/_getTagOwner":"never used by frontend",
+  "/api/Tagging/labelSubSet":"never used by frontend",
+  "/api/Tagging/hasAtLeastOneLabel":"never used by frontend",
 
-  "/api/Upvoting/_getUpvotessByUser":"",
-  "/api/Upvoting/_getUpvotesByItem":"",
-  "/api/Upvoting/_getAllUpvotes":""
+  "/api/Tagging/_getAllTags":"public",
+
+  "/api/Upvoting/_getUpvotesByItem":"public",
+  "/api/Upvoting/_getAllUpvotes":"public"
 };
 
 /**
@@ -92,6 +84,9 @@ export const exclusions: Array<string> = [
 
   "/api/Notifying/notify",
   "/api/Notifying/read",
+  "/api/Notifying/_getNotificationsByUser",
+  "/api/Notifying/_getReadNotificationsByUser",
+  "/api/Notifying/_getUnreadNotificationsByUser",
 
   "/api/Posting/createPost",
   "/api/Posting/deletePost",
@@ -100,13 +95,22 @@ export const exclusions: Array<string> = [
   "/api/Shelving/addBook",
   "/api/Shelving/removeBook",
   "/api/Shelving/changeStatus",
+  "/api/Shelving/_getUserShelfByBook",
+  "/api/Shelving/_getBooksByUser",
+  "/api/Shelving/_getShelfByBookAndOwner",
 
   "/api/Tagging/addTag",
   "/api/Tagging/removeTag",
   "/api/Tagging/markPrivate",
   "/api/Tagging/markPublic",
+  "/api/Tagging/_getTagsByBook",
+  "/api/Tagging/_getLabelsByBook",
+  "/api/Tagging/_getBooksByLabel",
+  "/api/Tagging/_getTagsByUser",
+  "/api/Tagging/_getLabelsByUser",
 
   "/api/Upvoting/upvote",
   "/api/Upvoting/unvote",
+  "/api/Upvoting/_getUpvotessByUser",
 
 ];

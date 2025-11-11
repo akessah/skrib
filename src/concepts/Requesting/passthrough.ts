@@ -38,7 +38,7 @@ export const inclusions: Record<string, string> = {
   "/api/Commenting/_getParent": "public",
   "/api/Commenting/_getAuthor": "public",
 
-  // "/api/Notifying/_getAllNotifications": "",
+  "/api/Notifying/_getAllNotifications": "never used by frontend",
   "/api/Notifying/_getRecipient":"never used by frontend",
 
   // "/api/Posting/_getPostsByAuthor":"",

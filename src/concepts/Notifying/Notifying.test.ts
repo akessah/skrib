@@ -19,7 +19,7 @@ Deno.test("Principle: A user receives and can view a notification", async () => 
   // 1. Simulate an event and notify user A
   const message = "Your post received a new comment!";
   console.log(`Action: Notifying ${userA} with message: "${message}"`);
-  const notifyResult = await notifyingConcept.notify({ user: userA, message });
+  const notifyResult = await notifyingConcept.notify({ user: userA, message, post:null });
   assertExists(notifyResult.notification, "Notification ID should be returned");
   const notificationId = notifyResult.notification;
   console.log(`Effect: Notification created with ID: ${notificationId}`);
@@ -76,7 +76,7 @@ Deno.test("Action: notify (user: User, message: String)", async (t) => {
     const notifyingConcept = new NotifyingConcept(db);
     const message1 = "Welcome to the app!";
     console.log(`Action: Notifying ${userA} with message: "${message1}"`);
-    const result1 = await notifyingConcept.notify({ user: userA, message: message1 });
+    const result1 = await notifyingConcept.notify({ user: userA, message: message1, post:null });
     assertExists(result1.notification, "Notification ID should be returned.");
 
     const allNotifications = await notifyingConcept._getAllNotifications({});
@@ -97,9 +97,9 @@ Deno.test("Action: notify (user: User, message: String)", async (t) => {
     const message2 = "Update 2";
 
     console.log(`Action: Notifying ${userA} with message: "${message1}"`);
-    const result1 = await notifyingConcept.notify({ user: userA, message: message1 });
+    const result1 = await notifyingConcept.notify({ user: userA, message: message1, post:null });
     console.log(`Action: Notifying ${userA} with message: "${message2}"`);
-    const result2 = await notifyingConcept.notify({ user: userA, message: message2 });
+    const result2 = await notifyingConcept.notify({ user: userA, message: message2, post:null });
 
     const userANotifications = await notifyingConcept._getNotificationsByUser({ recipient: userA });
     assertEquals(userANotifications.length, 2, "User A should have two notifications.");
@@ -122,9 +122,9 @@ Deno.test("Action: notify (user: User, message: String)", async (t) => {
     const messageB = "Message for Bob";
 
     console.log(`Action: Notifying ${userA} with message: "${messageA}"`);
-    await notifyingConcept.notify({ user: userA, message: messageA });
+    await notifyingConcept.notify({ user: userA, message: messageA, post:null });
     console.log(`Action: Notifying ${userB} with message: "${messageB}"`);
-    await notifyingConcept.notify({ user: userB, message: messageB });
+    await notifyingConcept.notify({ user: userB, message: messageB, post:null });
 
     const userANotifications = await notifyingConcept._getNotificationsByUser({ recipient: userA });
     assertEquals(userANotifications.length, 1, "User A should have one notification.");
@@ -164,7 +164,7 @@ Deno.test("Action: read (notification: Notification)", async (t) => {
       const [db, client] = await testDb();
       const notifyingConcept = new NotifyingConcept(db);
       const message = "Important update!";
-      const notifyResult = await notifyingConcept.notify({ user: userA, message });
+      const notifyResult = await notifyingConcept.notify({ user: userA, message, post:null });
       const notificationId = notifyResult.notification;
 
     // Confirm initial state: unread
@@ -197,7 +197,7 @@ Deno.test("Action: read (notification: Notification)", async (t) => {
     const [db, client] = await testDb();
     const notifyingConcept = new NotifyingConcept(db);
     const message = "Important update!";
-    const notifyResult = await notifyingConcept.notify({ user: userA, message });
+    const notifyResult = await notifyingConcept.notify({ user: userA, message, post:null });
     const notificationId = notifyResult.notification;
 
     // First, read the notification to mark it as read
@@ -232,9 +232,9 @@ Deno.test("Queries: _getNotificationsByUser, _getReadNotificationsByUser, _getUn
   const message2 = "Read for Alice";
   const message3 = "Unread for Bob";
 
-  const notif1 = (await notifyingConcept.notify({ user: userA, message: message1 })).notification;
-  const notif2 = (await notifyingConcept.notify({ user: userA, message: message2 })).notification;
-  const notif3 = (await notifyingConcept.notify({ user: userB, message: message3 })).notification;
+  const notif1 = (await notifyingConcept.notify({ user: userA, message: message1, post:null })).notification;
+  const notif2 = (await notifyingConcept.notify({ user: userA, message: message2, post:null })).notification;
+  const notif3 = (await notifyingConcept.notify({ user: userB, message: message3, post:null })).notification;
 
   // We already have a beforeEach that clears the database for each 'read' test block
   // so we re-create notifications here to ensure they exist for query tests.

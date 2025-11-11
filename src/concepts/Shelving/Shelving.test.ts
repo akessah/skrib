@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals, assertArrayIncludes } from "jsr:@std/assert";
+import { assertEquals, assertNotEquals, assertArrayIncludes, assertStrictEquals } from "jsr:@std/assert";
 import { testDb } from "@utils/database.ts";
 import ShelvingConcept from "./ShelvingConcept.ts";
 import { ID } from "@utils/types.ts";
@@ -33,7 +33,8 @@ Deno.test("Concept: Shelving", async (t) => {
 
             // Verify effect: shelf exists and has correct properties
             const userShelf = await shelving._getUserShelfByBook({ user: USER_1, book: BOOK_A });
-            assertArrayIncludes(userShelf, [0], "Expected bookA to be on user1's 'want to read' shelf.");
+            assertStrictEquals(userShelf.length, 1, "expected book to be found on shelf")
+            assertStrictEquals(userShelf[0]?.shelfNumber, 0, "Expected bookA to be on user1's 'want to read' shelf.");
             console.log(`Confirmation: Shelf '${shelfA_user1}' created for user '${USER_1}' and book '${BOOK_A}' with status 0.`);
         });
 
@@ -69,11 +70,13 @@ Deno.test("Concept: Shelving", async (t) => {
             console.log(`Trace: User '${USER_1}' changes status of Book '${BOOK_A}' (shelf '${shelfA_user1}') from 'want to read' (0) to 'reading' (1).`);
             const result = await shelving.changeStatus({ shelf: shelfA_user1, newStatus: 1 });
 
-            assertEquals(Object.keys(result).length, 0, "Expected changeStatus to return an empty object on success.");
+            assertEquals(Object.keys(result).length, 1, "Expected changeStatus to return an empty object on success.");
 
             // Verify effect: status is updated
             const userShelfStatuses = await shelving._getUserShelfByBook({ user: USER_1, book: BOOK_A });
-            assertArrayIncludes(userShelfStatuses, [1], "Expected bookA's status for user1 to be updated to 1.");
+            assertStrictEquals(userShelfStatuses.length, 1, "expected book to be found on shelf")
+            assertStrictEquals(userShelfStatuses[0]?.shelfNumber, 1, "Expected bookA to be on user1's 'want to read' shelf.");
+            // assertArrayIncludes(userShelfStatuses, [1], "Expected bookA's status for user1 to be updated to 1.");
             console.log(`Confirmation: Status of shelf '${shelfA_user1}' updated to 1.`);
         });
 
@@ -92,13 +95,17 @@ Deno.test("Concept: Shelving", async (t) => {
 
         console.log(`Trace: Querying status for user '${USER_1}' and book '${BOOK_A}'.`);
         const statuses = await shelving._getUserShelfByBook({ user: USER_1, book: BOOK_A });
-        assertArrayIncludes(statuses, [1], "Expected _getUserShelfByBook to return status 1 for BOOK_A by USER_1.");
+        assertStrictEquals(statuses.length, 1, "expected book to be found on shelf")
+        assertStrictEquals(statuses[0]?.shelfNumber, 1, "Expected bookA to be on user1's 'want to read' shelf.");
+        // assertArrayIncludes(statuses, [1], "Expected _getUserShelfByBook to return status 1 for BOOK_A by USER_1.");
         assertEquals(statuses.length, 1, "Expected only one status for a specific user and book.");
         console.log(`Confirmation: User '${USER_1}' has book '${BOOK_A}' with status: ${statuses}.`);
 
         console.log(`Trace: Querying status for user '${USER_2}' and book '${BOOK_A}'.`);
         const statuses2 = await shelving._getUserShelfByBook({ user: USER_2, book: BOOK_A });
-        assertArrayIncludes(statuses2, [2], "Expected _getUserShelfByBook to return status 2 for BOOK_A by USER_2.");
+        assertStrictEquals(statuses2.length, 1, "expected book to be found on shelf")
+        assertStrictEquals(statuses2[0]?.shelfNumber, 2, "Expected bookA to be on user1's 'want to read' shelf.");
+        // assertArrayIncludes(statuses2, [2], "Expected _getUserShelfByBook to return status 2 for BOOK_A by USER_2.");
         console.log(`Confirmation: User '${USER_2}' has book '${BOOK_A}' with status: ${statuses2}.`);
 
         console.log(`Trace: Querying status for non-existent book 'BOOK_C' by user '${USER_1}'.`);
@@ -188,25 +195,25 @@ Deno.test("Concept: Shelving", async (t) => {
         const addXResult = await shelving.addBook({ user: P_USER, status: 0, book: P_BOOK_X });
         p_shelfX = (addXResult as { shelf: ID }).shelf;
         assertNotEquals(p_shelfX, undefined, "Expected shelf for BookX to be created.");
-        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0], 0);
+        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0]?.shelfNumber, 0);
 
         console.log("Step 2: User starts reading BookX, changes status to 'reading' (1).");
         await shelving.changeStatus({ shelf: p_shelfX, newStatus: 1 });
-        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0], 1);
+        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0]?.shelfNumber, 1);
 
         console.log("Step 3: User finishes BookX, changes status to 'read' (2).");
         await shelving.changeStatus({ shelf: p_shelfX, newStatus: 2 });
-        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0], 2);
+        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_X }))[0]?.shelfNumber, 2);
 
         console.log("Step 4: User adds BookY as 'want to read' (0).");
         const addYResult = await shelving.addBook({ user: P_USER, status: 0, book: P_BOOK_Y });
         p_shelfY = (addYResult as { shelf: ID }).shelf;
         assertNotEquals(p_shelfY, undefined, "Expected shelf for BookY to be created.");
-        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_Y }))[0], 0);
+        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_Y }))[0]?.shelfNumber, 0);
 
         console.log("Step 5: User starts BookY but abandons it, changes status to 'did not finish' (3).");
         await shelving.changeStatus({ shelf: p_shelfY, newStatus: 3 });
-        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_Y }))[0], 3);
+        assertEquals((await shelving._getUserShelfByBook({ user: P_USER, book: P_BOOK_Y }))[0]?.shelfNumber, 3);
 
         console.log("Step 6: Verify _getBooksByUser reflects the final states.");
         const finalUserBooks = await shelving._getBooksByUser({ user: P_USER });
@@ -228,7 +235,7 @@ Deno.test("Concept: Shelving", async (t) => {
             console.log(`Trace: User '${USER_1}' removes Book '${BOOK_B}' (shelf '${shelfB_user1}').`);
             const result = await shelving.removeBook({ shelf: shelfB_user1 });
 
-            assertEquals(Object.keys(result).length, 0, "Expected removeBook to return an empty object on success.");
+            assertEquals(Object.keys(result).length, 1, "Expected removeBook to return an empty object on success.");
 
             // Verify effect: shelf no longer exists
             const userShelf = await shelving._getUserShelfByBook({ user: USER_1, book: BOOK_B });

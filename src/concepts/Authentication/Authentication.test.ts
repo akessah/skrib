@@ -117,12 +117,12 @@ Deno.test("Authentication Concept", async (t) => {
     console.log(`User ID for Alice: ${userId}`);
 
     console.log(`Attempting to change password for user: ${userId}`);
-    const changeResult = await concept.changePassword({ user: userId, newPassword });
+    const changeResult = await concept.changePassword({ currentPassword: "password123", user: userId, newPassword });
 
     console.log("Result:", changeResult);
     // Effects: replaces password of user with newPassword
     assertEquals("error" in changeResult, false, "Should not return an error");
-    assertEquals(changeResult, {}, "Should return an empty object for success");
+    assertEquals(changeResult, {success: "successful password change"}, "Should return an empty object for success");
 
     // Verify password has changed by trying to authenticate with old/new passwords
     console.log("Attempting authentication with old password (should fail)...");
@@ -148,12 +148,51 @@ Deno.test("Authentication Concept", async (t) => {
 
     console.log(`Attempting to change password for non-existent user: ${nonExistentUser}`);
     const changeResult = await concept.changePassword({
+      currentPassword: "1234",
       user: nonExistentUser,
       newPassword,
     });
 
     console.log("Result:", changeResult);
     assertEquals("error" in changeResult, true, "Should return an error for non-existent user");
+  });
+
+  await t.step("Action: changePassword - incorrect current password", async () => {
+    console.log("\n--- Testing changePassword (incorrect current password) ---");
+    const username = "Alice";
+    const password = "new_secure_password";
+    const newPassword = "newer_password"
+
+    const registeredUserResult = await concept.authenticate({
+      username: "Alice",
+      password,
+    });
+    const userId = (registeredUserResult as { user: ID }).user;
+    console.log(`User ID for Alice: ${userId}`);
+
+    console.log(`Attempting to change password for user: ${userId}`);
+    const changeResult = await concept.changePassword({ currentPassword: password, user: userId, newPassword });
+
+    console.log("Result:", changeResult);
+    // Effects: replaces password of user with newPassword
+    assertEquals("error" in changeResult, false, "Should not return an error");
+    assertEquals(changeResult, {success: "successful password change"}, "Should return an empty object for success");
+
+    // Verify password has changed by trying to authenticate with old/new passwords
+    console.log("Attempting authentication with old password (should fail)...");
+    const authOldPass = await concept.authenticate({ username, password: "password123" });
+    console.log("Auth with old password result:", authOldPass);
+    assertEquals("error" in authOldPass, true, "Authentication with old password should fail");
+
+    console.log("Attempting authentication with new password (should succeed)...");
+    const authNewPass = await concept.authenticate({ username, password: newPassword });
+    console.log("Auth with new password result:", authNewPass);
+    assertEquals("user" in authNewPass, true, "Authentication with new password should succeed");
+    assertEquals(
+      (authNewPass as { user: ID }).user,
+      userId,
+      "Authenticated user ID should match",
+    );
   });
 
   await t.step("Action: deleteUser - successful deletion", async () => {
@@ -175,7 +214,7 @@ Deno.test("Authentication Concept", async (t) => {
     console.log("Result:", deleteResult);
     // Effects: deletes user from Users set
     assertEquals("error" in deleteResult, false, "Should not return an error");
-    assertEquals(deleteResult, {}, "Should return an empty object for success");
+    assertEquals(deleteResult, {success: "successful deletion"}, "Should return an empty object for success");
 
     users = await concept._getAllUsers({});
     console.log("Users after deletion:", users.map((u) => u.username));
@@ -265,7 +304,7 @@ Deno.test("Authentication Concept", async (t) => {
     // Additional test: Change password and re-authenticate
     const newPassword = "super_secret_charlie";
     console.log(`\nStep 4: Change password for '${username}' to '${newPassword}'`);
-    const changePassResult = await concept.changePassword({ user: charlieId, newPassword });
+    const changePassResult = await concept.changePassword({ currentPassword: password, user: charlieId, newPassword });
     console.log("Change password result:", changePassResult);
     assertEquals("error" in changePassResult, false, "Password change should succeed");
     console.log(`Password for '${username}' changed successfully.`);

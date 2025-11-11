@@ -84,7 +84,7 @@ async deleteUser({ user }: { user: User }): Promise<{success:string}| {error: st
       return {error: `Incorrect current password`};
     }
     await this.users.updateOne({_id: user }, { $set: { password: newPassword } });
-    return {success: "successful deletion"};
+    return {success: "successful password change"};
   }
 
 

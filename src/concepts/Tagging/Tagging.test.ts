@@ -68,7 +68,7 @@ Deno.test("TaggingConcept: Add Tag - success", async () => {
   assertEquals(tagsByUser[0].user, userA, "Tag's user should be Alice");
   assertEquals(tagsByUser[0].label, "dystopian", "Tag's label should be 'dystopian'");
   assertEquals(tagsByUser[0].book, bookX, "Tag's book should be 1984");
-  assertEquals(tagsByUser[0].private, false, "Tag should be public by default");
+  assertEquals(tagsByUser[0].isPrivate, false, "Tag should be public by default");
 
   console.log(`Successfully added tag ${tagId}.`);
 //   await client.close();
@@ -132,7 +132,7 @@ Deno.test("TaggingConcept: Remove Tag - success", async () => {
 
   // Effects: Check if the tag was removed
   assertNotEquals((result as { error: string }).error, "tag doesn't exist", "Should not return an error for existing tag");
-  assertEquals(result, {}, "Result should be empty object on success");
+  assertEquals(result, {success: "successful removal"}, "Result should be empty object on success");
 
   // Confirm state change
   const tagsByUser = await tagging._getTagsByUser({ user: userA });
@@ -184,7 +184,7 @@ Deno.test("TaggingConcept: Mark Private - success", async () => {
 
   const updatedTags = await tagging._getTagsByUser({ user: userA });
   assertEquals(updatedTags.length, 1);
-  assertEquals(updatedTags[0].private, true, "Tag should be marked private");
+  assertEquals(updatedTags[0].isPrivate, true, "Tag should be marked private");
 
   console.log(`Tag ${tagId} successfully marked private.`);
 //   await client.close();
@@ -213,7 +213,7 @@ Deno.test("TaggingConcept: Mark Private - requires (already private)", async () 
 
   const updatedTags = await tagging._getTagsByUser({ user: userA });
   assertEquals(updatedTags.length, 1);
-  assertEquals(updatedTags[0].private, true, "Tag should be marked private");
+  assertEquals(updatedTags[0].isPrivate, true, "Tag should be marked private");
 
   console.log(`Tag ${tagId} successfully marked private.`);
 //   await client.close();
@@ -242,7 +242,7 @@ Deno.test("TaggingConcept: Mark Public - success", async () => {
 
   const updatedTags = await tagging._getTagsByUser({ user: userA });
   assertEquals(updatedTags.length, 1);
-  assertEquals(updatedTags[0].private, false, "Tag should be marked public");
+  assertEquals(updatedTags[0].isPrivate, false, "Tag should be marked public");
 
   console.log(`Tag ${tagId} successfully marked public.`);
 //   await client.close();
@@ -270,7 +270,7 @@ Deno.test("TaggingConcept: Mark Public - requires (already public)", async () =>
 
   const updatedTags = await tagging._getTagsByUser({ user: userA });
   assertEquals(updatedTags.length, 1);
-  assertEquals(updatedTags[0].private, false, "Tag should be marked public");
+  assertEquals(updatedTags[0].isPrivate, false, "Tag should be marked public");
 
   console.log(`Tag ${tagId} successfully marked public.`);
 //   await client.close();
@@ -453,7 +453,7 @@ Deno.test("TaggingConcept: Query _getAllPublicTags", async () => {
   assertEquals(publicTags.length, 2, "Should only retrieve 2 public tags");
   const publicLabels = publicTags.map((t) => t.label).sort();
   assertEquals(publicLabels, ["general", "shared"], "Only public labels should be present");
-  publicTags.forEach((t) => assertEquals(t.private, false, "All returned tags must be public"));
+  publicTags.forEach((t) => assertEquals(t.isPrivate, false, "All returned tags must be public"));
 
   console.log("Query _getAllPublicTags tests passed.");
 //   await client.close();
@@ -632,7 +632,7 @@ Deno.test("TaggingConcept: Principle Trace", async () => {
 
   let allTags = await tagging._getAllTags({});
   assertEquals(allTags.length, 5, "Total 5 tags should be in DB after initial adds.");
-  console.log("All tags in DB: ", allTags.map(t => `${t.user} tags ${t.book} with ${t.label} (private: ${t.private})`));
+  console.log("All tags in DB: ", allTags.map(t => `${t.user} tags ${t.book} with ${t.label} (private: ${t.isPrivate})`));
 
   // Trace step 2: Then, those books can be displayed in groups by shared tag
   console.log(`\nTrace Step 2: Books displayed in groups by shared tag.`);

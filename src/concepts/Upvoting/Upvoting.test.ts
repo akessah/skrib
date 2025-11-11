@@ -30,7 +30,7 @@ Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
 
     // Action: User A upvotes Item 1
     const result = await upvotingConcept.upvote({ user: userA, item: item1 });
-    assertEquals(result, {}, "Upvote should return an empty object on success.");
+    assertEquals(result, {success: "successful upvote"}, "Upvote should return an empty object on success.");
     console.log(`User ${userA} upvoted ${item1}. Result: ${JSON.stringify(result)}`);
 
     // Effect verification: Check if the vote exists
@@ -57,7 +57,7 @@ Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
 
     // Action: User A tries to upvote Item 1 again
     const result = await upvotingConcept.upvote({ user: userA, item: item1 });
-    assertNotEquals(result, {}, "Upvoting an already upvoted item should return an error.");
+    assertNotEquals(result, {success: "successful upvote"}, "Upvoting an already upvoted item should return an error.");
     assertEquals(
       (result as { error: string }).error,
       `User ${userA} has already upvoted ${item1}`,
@@ -86,7 +86,7 @@ Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
 
     // Action: User A unvotes Item 1
     const result = await upvotingConcept.unvote({ user: userA, item: item1 });
-    assertEquals(result, {}, "Unvote should return an empty object on success.");
+    assertEquals(result, {success: "successful unvote"}, "Unvote should return an empty object on success.");
     console.log(`User ${userA} unvoted ${item1}. Result: ${JSON.stringify(result)}`);
 
     // Effect verification: Check if the vote is removed
@@ -109,7 +109,7 @@ Deno.test("UpvotingConcept: Action and Principle Tests", async (t) => {
 
     // Action: User A tries to unvote Item 2 (which they never voted for)
     const result = await upvotingConcept.unvote({ user: userA, item: item2 });
-    assertNotEquals(result, {}, "Unvoting a non-existent vote should return an error.");
+    assertNotEquals(result, {success: "successful unvote"}, "Unvoting a non-existent vote should return an error.");
     assertEquals(
       (result as { error: string }).error,
       `User ${userA} hasn't upvoted ${item2}`,

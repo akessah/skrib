@@ -68,7 +68,7 @@ Deno.test("Action: editComment - Successfully edits an existing comment", async 
     const editResult = await commentingConcept.editComment({ comment: commentId, newBody });
 
     // effects: replaces body of comment with newBody
-    assertEquals(editResult, {}, "Editing a comment should return an empty object on success.");
+    assertEquals(editResult, {success: "successful edit"}, "Editing a comment should return an empty object on success.");
     console.log(`Edited comment ID: ${commentId} with new body: "${newBody}"`);
 
     const commentsByAuthor = await commentingConcept._getCommentsByAuthor({ author: userAlice });
@@ -102,7 +102,7 @@ Deno.test("Action: deleteComment - Successfully deletes an existing comment", as
     const deleteResult = await commentingConcept.deleteComment({ comment: commentId });
 
     // effects: removes comment from Comments set
-    assertEquals(deleteResult, {}, "Deleting a comment should return an empty object on success.");
+    assertEquals(deleteResult, {success: "successful deletion"}, "Deleting a comment should return an empty object on success.");
     console.log(`Deleted comment with ID: ${commentId}`);
 
     allComments = await commentingConcept._getAllComments({});

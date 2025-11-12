@@ -12,6 +12,12 @@ In this assignment, you'll begin creating your backend by implementing your conc
 # Assignment 4b Updated Design File
 [Overall Design File](design\concepts\design_files\overall_project.md)
 
+# Assignment 4c Deliverables Links
+- [Design Document](design/concepts/design_files/final_design_doc.md)
+- [Video](./Deployed_Skrib_Video.mp4)
+- [Trace](./trace.md)
+- [Reflections Document](./reflection.md)
+
 
 
 

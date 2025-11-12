@@ -135,14 +135,14 @@ export const ChangeStatusFailureResponse: Sync = (
 
 //queries
 export const GetUserShelfByBook: Sync = (
-    {request, session, user, shelfNumber, results}
+    {request, session, user, shelfNumber, book}
 ) => ({
-    when: actions([Requesting.request, { path: "/Shelving/_getUserShelfByBook", session, }, { request }],),
+    when: actions([Requesting.request, { path: "/Shelving/_getUserShelfByBook", session, book}, { request }],),
     where: async (frames) => {
         const originalFrame = frames[0];
         frames = await frames.query( Sessioning._getUser, { session }, { user });
         console.log(frames);
-        frames = await frames.query( Shelving._getUserShelfByBook, {recipient: user}, {shelfNumber});
+        frames = await frames.query( Shelving._getUserShelfByBook, { user, book}, {shelfNumber});
         console.log(frames);
         if (frames.length === 0) {
           const response = {...originalFrame, [shelfNumber]: []}

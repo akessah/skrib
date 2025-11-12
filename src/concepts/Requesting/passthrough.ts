@@ -38,15 +38,15 @@ export const inclusions: Record<string, string> = {
   "/api/Commenting/_getParent": "public",
   "/api/Commenting/_getAuthor": "public",
 
-  // "/api/Notifying/_getAllNotifications": "",
+  "/api/Notifying/_getAllNotifications": "",
   "/api/Notifying/_getRecipient":"never used by frontend",
 
   // "/api/Posting/_getPostsByAuthor":"",
   "/api/Posting/_getAllPosts":"public",
   "/api/Posting/_getAuthor":"never actually used by frontend",
 
-  "/api/Shelving/_getShelvesByBook":"",
-  "/api/Shelving/_getAllShelves":"",
+  "/api/Shelving/_getShelvesByBook":"never used by frontend",
+  "/api/Shelving/_getAllShelves":"never used by frontend",
   "/api/Shelving/_getShelfOwner":"never used by frontend",
 
   "/api/Tagging/_getAllPublicTags": "public query",
@@ -55,6 +55,7 @@ export const inclusions: Record<string, string> = {
   "/api/Tagging/hasAtLeastOneLabel":"never used by frontend",
 
   "/api/Tagging/_getAllTags":"public",
+  "/api/Tagging/_getBooksByLabel":"only ever used for public labels",
 
   "/api/Upvoting/_getUpvotesByItem":"public",
   "/api/Upvoting/_getAllUpvotes":"public"
@@ -105,7 +106,6 @@ export const exclusions: Array<string> = [
   "/api/Tagging/markPublic",
   "/api/Tagging/_getTagsByBook",
   "/api/Tagging/_getLabelsByBook",
-  "/api/Tagging/_getBooksByLabel",
   "/api/Tagging/_getTagsByUser",
   "/api/Tagging/_getLabelsByUser",
 

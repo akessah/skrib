@@ -141,7 +141,9 @@ export const GetUserShelfByBook: Sync = (
     where: async (frames) => {
         const originalFrame = frames[0];
         frames = await frames.query( Sessioning._getUser, { session }, { user });
+        console.log(frames);
         frames = await frames.query( Shelving._getUserShelfByBook, {recipient: user}, {shelfNumber});
+        console.log(frames);
         if (frames.length === 0) {
           const response = {...originalFrame, [shelfNumber]: []}
           return new Frames(response)
